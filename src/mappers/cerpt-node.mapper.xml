@@ -1,0 +1,149 @@
+
+<xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cerptNodeMapper">
+
+    <select id ="findByFilters">
+        SELECT
+            cn.ID,
+            cn.NAME,
+            cn.DESCRIPTION1,
+            cn.DESCRIPTION2,
+            cn.DESCRIPTION3,
+            cn.EFFECTIVE_DATE
+        FROM
+            CERPT_NODES cn
+        WHERE
+            cn.ID = #{nodeId}
+            AND cn.END_DATE IS NULL
+    </select>
+
+    <select id="getNextNodeId">
+        SELECT CERPT_NODES_ID_SEQ.nextval AS SEQ_NUM FROM DUAL
+    </select>
+
+    <insert id="addNode">
+        INSERT INTO CERPT_NODES 
+        (
+            CORP_ID, ID, NAME, EFFECTIVE_DATE,
+            DESCRIPTION1, DESCRIPTION2, DESCRIPTION3, CREATE_DATE,
+            CREATE_NAME, LAST_UPDATE_DATE, LAST_UPDATE_NAME, EXCLUDE_FROM_REPORTS_FLAG,
+            NTP_ID, NODE_TYPE, WTN, WTN_TYPE
+        )
+        SELECT
+            CORP_ID,
+            #{id},
+            q'[${name}]',
+            SYSDATE,
+            <choose>
+                <when test="description1 != null">
+                    q'[${description1}]',
+                </when>
+                <otherwise>
+                    NULL,
+                </otherwise>
+            </choose>
+            <choose>
+                <when test="description2 != null">
+                    q'[${description2}]',
+                </when>
+                <otherwise>
+                    NULL,
+                </otherwise>
+            </choose>
+            <choose>
+                <when test="description3 != null">
+                    q'[${description3}]',
+                </when>
+                <otherwise>
+                    NULL,
+                </otherwise>
+            </choose>
+            SYSDATE,
+            #{loginUser},
+            SYSDATE,
+            #{loginUser},
+            #{reportingFlag},
+            NTP_ID + 1,
+            #{nodeType},
+            #{wtn},
+            #{wtnType}
+        FROM
+            CERPT_HIERARCHY_NODES
+        WHERE
+            ID = #{parentHierarchyNodeId}
+    </insert>
+
+    <update id="updateRecord">   
+        UPDATE CERPT_NODES 
+        <set>
+            <if test="nodeName and nodeName !=''"> 
+                NAME = q'[${nodeName}]',
+            </if>
+            <if test ="description1 != undefined">
+                <choose>
+                    <when test="description1 == null">
+                        DESCRIPTION1 = NULL,
+                    </when>
+                    <otherwise>
+                        DESCRIPTION1 = q'[${description1}]',
+                    </otherwise>
+                </choose>
+            </if>
+            <if test ="description2 != undefined">
+                <choose>
+                    <when test="description2 == null">
+                        DESCRIPTION2 = NULL,
+                    </when>
+                    <otherwise>
+                        DESCRIPTION2 = q'[${description2}]',
+                    </otherwise>
+                </choose>
+            </if>
+            <if test ="description3 != undefined">
+                <choose>
+                    <when test="description3 == null">
+                        DESCRIPTION3 = NULL,
+                    </when>
+                    <otherwise>
+                        DESCRIPTION3 = q'[${description3}]',
+                    </otherwise>
+                </choose>
+            </if>
+            LAST_UPDATE_NAME = #{loginUser},
+            LAST_UPDATE_DATE = SYSDATE
+        </set>          
+        WHERE ID = #{nodeId}
+        AND NODE_TYPE IN ('NODE')
+    </update>
+
+    <delete id = "deleteRecord">      
+        DELETE FROM CERPT_NODES
+        WHERE ID = #{nodeId} 
+    </delete>
+
+    <select id="findByParams">
+        SELECT
+            TO_CHAR(ID) AS ID,
+            TO_CHAR(CORP_ID) AS CORP_ID
+        FROM
+            CERPT_NODES
+        WHERE
+            END_DATE IS NULL
+            <if test="nodeName">
+                AND UPPER(NAME) = UPPER(q'[${nodeName}]')
+            </if>
+            <if test="wtn">
+                AND NAME = #{wtn}
+            </if>
+            <if test="corpId">
+                AND CORP_ID = #{corpId}
+            </if>
+            <if test="ownNodeId">
+                AND ID != #{ownNodeId}
+            </if>
+            <if test="nodeId">
+                AND ID = #{nodeId}
+            </if>
+    </select>
+</mapper>

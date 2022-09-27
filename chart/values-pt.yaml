@@ -1,0 +1,10 @@
+namespace: oe-b2b-evs-pt
+nodeEnv: pt
+replicaCount: 2
+resources:
+  limits:
+    cpu: 500m
+    memory: 2Gi
+  requests:
+    cpu: 500m
+    memory: 2Gi

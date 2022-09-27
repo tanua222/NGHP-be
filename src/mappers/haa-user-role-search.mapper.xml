@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="haaUserRoleSearchMapper">
+
+  <select id="findAssignedUsers">
+    WITH u_assigned AS (
+      SELECT DISTINCT TO_CHAR(ur.user_id) AS user_id,
+            u.last_name AS user_last_name, 
+            u.first_name AS user_first_name, 
+            u.login_user_name AS user_login_name,
+            c.value AS user_email,
+            TO_CHAR(ur.hn_id) AS node_id,
+            n.nde_name AS node_name,
+            (n.ntp_id - 4) AS node_level,
+            e.node_type,
+            CASE 
+              WHEN n.end_date IS NOT NULL THEN 'N'
+              <!-- can session user action on this record? -->
+              ELSE (SELECT DECODE(COUNT(*), 0, 'N', 'Y')
+                      FROM haa_user_hierarchy_roles ee,
+                          (SELECT r.role_id, p.description
+                             FROM haa_role_privileges rp, haa_roles r, haa_privileges p
+                            WHERE rp.Role_Id =  r.Role_id AND rp.Privilege_Id =  p.Privilege_Id) ff
+                    WHERE ee.role_id = ff.role_id
+                      AND ee.user_id = ${loginUserId}
+                      AND ff.description = 'ASSIGN-USER-ROLE'
+                      AND (ee.hn_id = ur.hn_id
+                          OR (ee.cascading = 'Y'
+                                AND ee.hn_id IN (
+                                      SELECT gg.id
+                                        FROM cerpt_hierarchy_nodes gg
+                                      WHERE gg.id != ur.hn_id
+                                      START WITH gg.id = ur.hn_id
+                                    CONNECT BY gg.id = PRIOR parent_hierarchy_id
+                                  ))))
+            END AS can_unassign_indicator
+      FROM cerpt_users u
+          INNER JOIN haa_user_hierarchy_roles ur ON (ur.user_id = u.ID)
+          INNER JOIN cerpt_hierarchy_nodes n ON (n.ID = ur.hn_id 
+          <!-- We are commenting out this part of code to support corporation clustering as in that case user corp would be of parent
+           for all the users but we need to show all users linked with this corp id in case of advanced search
+           and parentHnId in case of normal search -->
+          <!-- AND n.corp_id = u.corp_id -->
+          )
+          LEFT JOIN cerpt_contact_methods c ON (c.usr_id = u.ID AND c.cmt_code = 1)
+          LEFT JOIN cerpt_nodes e ON (e.id = n.nde_id)
+      
+    <trim prefix="WHERE" prefixOverrides="AND|OR">
+
+      <if test="corporationId">
+      <!-- We changed it to n corp id to support corporation clustering as in that case user corp would be of parent
+           for all the users but we need to show all users linked with this corp id in case of advanced search
+           and parentHnId in case of normal search -->
+        AND n.corp_id = ${corporationId}
+      </if>
+      <if test="parentHnId">
+        AND n.ID = ${parentHnId}
+      </if>
+        AND u.end_date IS NULL
+        AND EXISTS (
+              <!-- show results visible to session user only -->
+              SELECT 1
+                FROM haa_user_hierarchy_roles ee,
+                    (SELECT r.role_id, p.description
+                       FROM haa_role_privileges rp, haa_roles r, haa_privileges p
+                      WHERE rp.Role_Id =  r.Role_id AND rp.Privilege_Id =  p.Privilege_Id) ff
+              WHERE ee.role_id = ff.role_id
+                AND ee.user_id = ${loginUserId}
+                AND ff.description = 'VIEW-NODE'
+                AND (ee.hn_id = ur.hn_id
+                    OR (ee.cascading = 'Y'
+                          AND ee.hn_id IN (
+                                SELECT gg.id
+                                  FROM cerpt_hierarchy_nodes gg
+                                WHERE gg.id != ur.hn_id
+                                START WITH gg.id = ur.hn_id
+                              CONNECT BY gg.id = PRIOR parent_hierarchy_id
+                          )
+                        )
+                    )
+                  )
+      <if test="lastName">
+        AND lower(u.last_name) LIKE lower(q'[%${lastName}%]')
+      </if>
+      <if test="firstName">
+        AND lower(u.first_name) LIKE lower(q'[%${firstName}%]')
+      </if>
+      <if test="loginUserName">
+        AND lower(u.login_user_name) LIKE lower(q'[%${loginUserName}%]')
+      </if>
+      <if test="nodeName">
+        AND lower(n.nde_name) LIKE lower(q'[%${nodeName}%]')
+      </if>
+      <if test="nodeLevel >= -1">
+        AND n.ntp_id = ${nodeLevel}
+      </if>
+
+    </trim>
+
+    ), numbered AS (
+        SELECT
+            ROW_NUMBER() OVER(
+            <foreach collection="sortConditions" index="index" item="item" open="ORDER BY " separator="," close="">
+       			  ${item}
+  			    </foreach>
+            ) rn,
+            u_assigned.*
+        FROM
+            u_assigned
+    ) SELECT
+        a.*
+    FROM
+        (
+            SELECT
+                ceil( (
+                    SELECT
+                        COUNT(*)
+                    FROM
+                        numbered
+                ) / ${paginationParam.limit}) total_pages,
+                (
+                    SELECT
+                        COUNT(*)
+                    FROM
+                        numbered
+                ) total_rows,
+                numbered.*
+            FROM
+                numbered
+            WHERE
+                rn BETWEEN (${paginationParam.offset} + 1 ) AND (${paginationParam.offset} + ${paginationParam.limit})
+        ) a
+  </select>
+
+  <select id="findUnassignedUsers">
+      SELECT
+        TO_CHAR(u.id) AS u_id,
+        u.last_name AS u_last_name,
+        u.first_name AS u_first_name,
+        u.login_user_name AS u_login_name
+      FROM
+          cerpt_users u
+      WHERE
+          u.CORP_ID = (
+          SELECT tx2.CON_ID FROM TCORP_XREF tx2 WHERE tx2.TCORP_XREF_ID = (
+            SELECT TCORP_XREF_ID_PARENT FROM TCORP_XREF tx WHERE con_id = (SELECT CORP_ID FROM CERPT_HIERARCHY_NODES chn WHERE chn.id = ${parentHnId})
+            )
+        )
+        AND u.end_date IS NULL
+        AND NOT EXISTS (
+        SELECT
+          1
+        FROM
+          haa_user_hierarchy_roles r,
+          CERPT_HIERARCHY_NODES n
+        WHERE
+          r.user_id = u.id
+          AND hn_id = n.id
+          AND n.id = ${parentHnId})
+      ORDER BY
+        LOWER(u.login_user_name)
+  </select>
+
+  <select id="findAssignedUserDetails">
+      Select  TO_CHAR(a.role_id) AS r_role_id,
+              b.name,
+              b.description,
+              a.cascading AS r_cascading,
+              c.last_name AS u_last_name,
+              c.first_name AS u_first_name,
+              c.login_user_name AS u_login_user_name,
+              TO_CHAR(c.id) AS u_id,
+              TO_CHAR(a.hn_id) AS hn_id
+      From    haa_user_hierarchy_roles a, haa_roles b, cerpt_users c
+      Where   a.user_id (+) = c.id
+      And     b.role_id (+) = a.role_id
+      And     a.hn_id (+) = ${hnId}
+      And     c.id = ${userId}
+      Order By LOWER(b.description)
+  </select>
+
+  <select id="findUnassignedRoles">
+    SELECT  DISTINCT
+            TO_CHAR(D.assignable_role_id) AS assignable_role_id,
+            E.NAME,
+            E.DESCRIPTION,
+            'Y' cascading
+    FROM    haa_assignable_roles D,
+            haa_roles E,
+            haa_user_hierarchy_roles F,
+            cerpt_users u
+    WHERE   D.assignable_role_id = E.role_id
+    AND     E.status = 'EXTERNAL'
+    AND     D.role_id = F.role_id
+    AND     F.user_id = u.ID
+    AND     F.cascading = 'Y'
+    AND     UPPER(NVL(u.uuid_id, u.login_user_name)) = UPPER(#{loginUser})
+    AND     (
+                (
+                F.hn_id IN
+                    (
+                    SELECT  ID
+                    FROM    cerpt_hierarchy_nodes
+                    WHERE   ID != ${parentHnId}
+                    START WITH ID = ${parentHnId}
+                    CONNECT BY ID = PRIOR parent_hierarchy_id
+                    )
+                AND F.cascading = 'Y'
+                )
+            OR  F.hn_id = ${parentHnId}
+            )
+    UNION
+    SELECT  DISTINCT
+            TO_CHAR(D.assignable_role_id) AS assignable_role_id,
+            E.NAME,
+            E.DESCRIPTION,
+            'N' cascading
+    FROM    haa_assignable_roles D,
+            haa_roles E,
+            haa_user_hierarchy_roles F,
+            cerpt_users u
+    WHERE   D.assignable_role_id = E.role_id
+    AND     E.status = 'EXTERNAL'
+    AND     D.role_id = F.role_id
+    AND     F.user_id = u.ID
+    AND     UPPER(NVL(u.uuid_id, u.login_user_name)) = UPPER(#{loginUser})
+    AND     (
+                (
+                F.hn_id IN
+                    (
+                    SELECT  ID
+                    FROM    cerpt_hierarchy_nodes
+                    WHERE   ID != ${parentHnId}
+                    START WITH ID = ${parentHnId}
+                    CONNECT BY ID = PRIOR parent_hierarchy_id
+                    )
+                AND F.cascading = 'Y'
+                )
+            OR 
+            F.hn_id = ${parentHnId}
+            )
+    ORDER BY DESCRIPTION
+  </select>
+
+  <select id="findUsersByHnId">
+    SELECT
+      haa.USER_ID
+    FROM
+      HAA_USER_HIERARCHY_ROLES haa
+    WHERE
+      haa.HN_ID = ${hnId}
+  </select>
+</mapper>

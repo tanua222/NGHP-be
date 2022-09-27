@@ -1,0 +1,36 @@
+{
+	"info": {
+		"_postman_id": "ea1c690c-e981-4c71-8347-46e6ee22ae51",
+		"name": "IVS HAA UnassignTollfree",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "unassignTollfreeNumber",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "[\r\n    {\r\n        \"entityNodeId\": \"600031454\"\r\n    },\r\n    {\r\n        \"entityNodeId\": \"600031455\"\r\n    }\r\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseHierarchyUrl}}/tollFreeNumberEntity/unassign",
+					"host": [
+						"{{baseHierarchyUrl}}"
+					],
+					"path": [
+						"tollFreeNumberEntity",
+						"unassign"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

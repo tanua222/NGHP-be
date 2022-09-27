@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.name }}-configmap-{{ .Values.nodeEnv }}
+  namespace: {{ .Values.namespace }} 
+data:
+{{ (.Files.Glob (printf "config/%s.yaml" .Values.nodeEnv ) ).AsConfig | indent 2 }}
+{{ (.Files.Glob ("config/default.yaml") ).AsConfig | indent 2 }}

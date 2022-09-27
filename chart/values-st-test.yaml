@@ -1,0 +1,10 @@
+namespace: oe-b2b-evs-st
+nodeEnv: st
+name: test-ivs-hierarchy
+resources:
+  limits:
+    cpu: 50m
+    memory: 1Gi
+  requests:
+    cpu: 50m
+    memory: 1Gi

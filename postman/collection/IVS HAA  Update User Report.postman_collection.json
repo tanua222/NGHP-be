@@ -1,0 +1,42 @@
+{
+	"info": {
+		"_postman_id": "f409c0a8-b44d-4777-a68a-e185ef9e5737",
+		"name": "IVS HAA  Update User Report",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "updateUserReport",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"recipientUserId\": \"600002004\",\r\n    \"format\": \"CSV\",\r\n    \"language\": \"E\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseHierarchyUrl}}/userReport/:assignedReportId",
+					"host": [
+						"{{baseHierarchyUrl}}"
+					],
+					"path": [
+						"userReport",
+						":assignedReportId"
+					],
+					"variable": [
+						{
+							"key": "assignedReportId",
+							"value": "600002074"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

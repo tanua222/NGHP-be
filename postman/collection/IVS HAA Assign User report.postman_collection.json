@@ -1,0 +1,36 @@
+{
+	"info": {
+		"_postman_id": "162b7c65-d54a-4873-9eda-779f1919eb3e",
+		"name": "IVS HAA Assign User report",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "assignUserReport",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"parentHierarchyNodeId\": \"600004017\",\r\n    \"reportId\": [\r\n        5,\r\n        4\r\n    ],\r\n    \"format\": \"CSV\",\r\n    \"language\": \"E\",\r\n    \"recipientUserId\": \"600002564\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseHierarchyUrl}}/userReport/assign",
+					"host": [
+						"{{baseHierarchyUrl}}"
+					],
+					"path": [
+						"userReport",
+						"assign"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

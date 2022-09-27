@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="haaExtractsMapper">
+
+  <select id="findByFilters">
+    SELECT * 
+      FROM thierarchy_extract
+      <trim prefix="WHERE" prefixOverrides="AND|OR">
+        <if test="entityId">
+          AND extract_id = ${entityId}
+        </if>
+      </trim>
+  </select>
+
+  <select id="findByFiltersWithPagination">
+    WITH main_query AS (
+      SELECT ex.*, n.nde_name
+        FROM THIERARCHY_EXTRACT ex
+            INNER JOIN cerpt_hierarchy_nodes n ON (n.ID = ex.hierarchy_node_id)
+      WHERE ex.user_id = ${loginUserId}
+      AND ex.con_id = ${corporationId}
+    ), numbered AS (
+        SELECT
+            ROW_NUMBER() OVER(
+            <foreach collection="sortConditions" index="index" item="item" open="ORDER BY " separator="," close="">
+              ${item}
+            </foreach>
+            ) rn,
+            main_query.*
+        FROM main_query
+    ) SELECT
+        a.*
+    FROM
+        (
+            SELECT
+                ceil( (
+                    SELECT
+                        COUNT(*)
+                    FROM
+                        numbered
+                ) / ${paginationParam.limit}) total_pages,
+                (
+                    SELECT
+                        COUNT(*)
+                    FROM
+                        numbered
+                ) total_rows,
+                numbered.*
+            FROM
+                numbered
+            WHERE
+                rn BETWEEN (${paginationParam.offset} + 1 ) AND (${paginationParam.offset} + ${paginationParam.limit})
+        ) a
+  </select>
+
+  <delete id = "deleteRecord">      
+    DELETE FROM thierarchy_extract
+    WHERE extract_id = ${dbEntity.extractId} and user_id = ${loginUserId}
+  </delete>
+
+
+  <select id="getCorpIdByHnId">
+     SELECT b.cos_corporate_id,a.corp_id
+      FROM CERPT_HIERARCHY_NODES a,tcorporation b
+      WHERE a.corp_id = b.con_id and a.ID = ${hierarchyNodeId}
+  </select>
+
+  <select id="getNextExtractId">
+    select EXTRACT_ID_SEQ.nextval as EXTRACT_ID from dual
+  </select>
+
+  <select id="getColumnTranslation">
+    SELECT *
+    FROM CERPT_LANGUAGE_TRANSLATIONS
+    WHERE OBJECT_TYPE = 'CSV_RPT' AND 
+    object_id = 'Cerpt_Csv_Reports_Pkg' 
+    and object_value  in (${columns})
+  </select>
+
+  <insert id="addRecord">
+        INSERT INTO THIERARCHY_EXTRACT 
+        (
+            EXTRACT_ID, USER_ID, CON_ID, HIERARCHY_NODE_ID,
+            LANGUAGE_CODE, STATUS, 
+            CREATED_BY, CREATED_ON,
+            UPDATED_BY, UPDATED_ON
+        )
+        VALUES (        
+            ${dbEntity.extractId}, ${loginUserId}, ${dbEntity.conId}, ${dbEntity.hierarchyNodeId},
+            #{dbEntity.languageCode}, 'PENDING',
+            #{uuid},SYSDATE,
+            #{uuid},SYSDATE
+        )
+    </insert>
+
+    <update id="updateRecord"> 
+        UPDATE THIERARCHY_EXTRACT
+        SET
+            EXTRACT_FILE = #{dbEntity.extractFile},
+            EXTRACT_FILE_NAME = #{dbEntity.extractFileName},
+            STATUS = 'COMPLETED',
+            UPDATED_BY = #{uuid}, 
+            UPDATED_ON = SYSDATE,
+        WHERE extract_id = ${dbEntity.extractId}
+    </update>
+
+
+   <update id="updateRejectedStatus"> 
+        UPDATE THIERARCHY_EXTRACT
+        SET
+            STATUS = 'REJECTED',
+            MESSAGE = #{message},
+            UPDATED_BY = #{uuid}, 
+            UPDATED_ON = SYSDATE
+        WHERE extract_id = ${extractId}
+    </update>
+
+  <select id="getUserIdByExtractId">
+    SELECT USER_ID
+    FROM THIERARCHY_EXTRACT
+    WHERE EXTRACT_ID = ${extractId}
+  </select>
+</mapper>

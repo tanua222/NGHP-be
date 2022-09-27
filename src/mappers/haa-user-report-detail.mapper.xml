@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="haaUserReportDetailMapper">
+  <select id="findByFilters">
+    SELECT
+      to_char(hnr.id) as report_id,
+      r.code,
+      hnr.lan_code,
+      lt.object_translated_value as name,
+      to_char(hnr.usr_id) as user_id,
+      u.login_user_name,
+      hnr.fmt_code 
+    FROM
+      CERPT_REPORTS r,
+      CERPT_HIERARCHY_NODE_REPORTS hnr,
+      cerpt_users u,
+      cerpt_language_translations lt
+    WHERE
+      hnr.id = #{assignedReportId}
+      and hnr.rpt_id = r.id
+      and hnr.usr_id = u.id
+      and r.code = lt.object_id
+      and lt.lan_code = #{lan}  
+  </select>
+</mapper>

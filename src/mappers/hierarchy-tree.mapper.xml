@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="hierarchyTreeMapper">
+
+  <!-- <select id="getPartialTree">
+    SELECT
+        x.id,
+        x.nde_id,
+        x.nde_name,
+        x.parent_hierarchy_id,
+        DECODE(SIGN(NVL(x.end_date, sysdate + 1000000) - sysdate), -1, 0, 0, 0, 1) as IS_ACTIVE,
+        NVL(sign(c.HAS_CHILD), 0) as HAS_CHILD,
+        x.effective_date,
+        x.end_date,
+        n.node_type as NODE_TYPE
+    FROM
+        cerpt_hierarchy_nodes x,
+        cerpt_nodes n,
+        cerpt_hnodes_haschild c
+    WHERE
+        x.nde_id = n.id
+        AND x.id = c.hnode_id (+)
+        AND n.node_type != 'WTN'
+        AND trunc(x.Effective_Date) <= trunc(#{endDate})
+        AND trunc(NVL(x.End_Date, SYSDATE + 1000000)) > trunc(#{startDate})
+        AND ( x.parent_hierarchy_id IN (
+        SELECT
+            chn.id
+        FROM
+            cerpt_hierarchy_nodes chn
+        WHERE
+            chn.parent_hierarchy_id > 1
+
+            START WITH chn.id = ${drillDownHierarchyNodeId}
+        CONNECT BY
+            chn.id = PRIOR chn.parent_hierarchy_id ) )
+    UNION ALL
+    SELECT
+        x.id,
+        x.nde_id,
+        x.nde_name,
+        x.parent_hierarchy_id,
+        DECODE(SIGN(NVL(x.end_date, sysdate + 1000000) - sysdate), -1, 0, 0, 0, 1),
+        NVL(sign(c.HAS_CHILD), 0),
+        x.effective_date,
+        x.end_date,
+        'ROOT'
+    FROM
+        cerpt_hierarchy_nodes x,
+        cerpt_hnodes_haschild c
+    WHERE
+        x.id = c.hnode_id (+)
+        AND x.corp_id = ${corporationId}
+        AND x.ntp_id = 4
+  </select> -->
+
+  <!-- <select id="getEntireTree"> 
+    SELECT
+        x.id,
+        x.nde_id,
+        x.nde_name,
+        x.parent_hierarchy_id,
+        DECODE(SIGN(NVL(x.end_date, sysdate + 1000000) - sysdate), -1, 0, 0, 0, 1) AS IS_ACTIVE,
+        NVL(sign(c.HAS_CHILD), 0) AS HAS_CHILD,
+        x.effective_date,
+        x.end_date,
+        n.node_type
+    FROM
+        (
+        SELECT
+            c.id,
+            c.nde_id,
+            c.nde_name,
+            c.parent_hierarchy_id,
+            NULL,
+            NULL,
+            trunc(c.effective_date) effective_date,
+            trunc(c.end_date) end_date
+        FROM
+            Cerpt_Hierarchy_Nodes c
+        WHERE
+            trunc(c.Effective_Date) <= trunc(#{endDate})
+            AND trunc(NVL(c.End_Date, sysdate + 1000000)) > trunc(#{startDate})
+            START WITH c.id = ${corpRootHierId}
+        CONNECT BY
+            PRIOR c.Id = c.Parent_Hierarchy_Id) x,
+        Cerpt_Nodes n,
+        cerpt_hnodes_haschild c
+    WHERE
+        x.nde_id = n.id
+        AND x.id = c.hnode_id (+)
+  </select> -->
+
+  <select id="getTreeByCorpId">
+    SELECT
+        TO_CHAR(chn.ID) AS ID,
+        chn.NTP_ID AS NTP_ID,
+        TO_CHAR(chn.NDE_ID) AS NDE_ID,
+        chn.NDE_NAME,
+        TO_CHAR(chn.PARENT_HIERARCHY_ID) AS PARENT_HIERARCHY_ID,
+        chn.EFFECTIVE_DATE,
+        cn.NODE_TYPE as NODE_TYPE
+    FROM
+        CERPT_HIERARCHY_NODES chn,
+        cerpt_nodes cn
+    WHERE
+        chn.nde_id = cn.id
+        AND chn.parent_hierarchy_id > 1
+        <if test="includeWTN != null and includeWTN == false">
+          AND cn.NODE_TYPE != 'WTN'
+        </if>
+        AND chn.CORP_ID = ${corpId}
+        AND chn.END_DATE IS NULL
+    ORDER BY
+        LOWER(chn.NDE_NAME)
+        
+  </select>
+
+  <select id="getTreeByCorpIdWithMoveIndicator">
+    SELECT
+        TO_CHAR(chn.ID) AS ID,
+        chn.NTP_ID AS NTP_ID,
+        TO_CHAR(chn.NDE_ID) AS NDE_ID,
+        chn.NDE_NAME,
+        TO_CHAR(chn.PARENT_HIERARCHY_ID) AS PARENT_HIERARCHY_ID,
+        chn.EFFECTIVE_DATE,
+        cn.NODE_TYPE as NODE_TYPE,
+        CASE 
+            WHEN chn.end_date IS NOT NULL THEN 'N'
+            ELSE (SELECT DECODE(COUNT(*), 0, 'N', 'Y')
+                    FROM haa_user_hierarchy_roles ee,
+                        (SELECT r.role_id, p.description
+                            FROM haa_role_privileges rp, haa_roles r, haa_privileges p
+                        WHERE rp.Role_Id =  r.Role_id AND rp.Privilege_Id =  p.Privilege_Id) ff
+                WHERE ee.role_id = ff.role_id
+                    AND ee.user_id = ${loginUserId}
+                    AND ff.description = 'MOVE-NODE'
+                    AND (ee.hn_id = chn.ID
+                        OR (ee.cascading = 'Y'
+                            AND ee.hn_id IN (
+                                    SELECT gg.id
+                                    FROM cerpt_hierarchy_nodes gg
+                                    WHERE gg.id != chn.ID
+                                    START WITH gg.id = chn.ID
+                                CONNECT BY gg.id = PRIOR parent_hierarchy_id
+                                ))))
+        END AS CAN_MOVE_INDICATOR
+    FROM
+        CERPT_HIERARCHY_NODES chn,
+        cerpt_nodes cn
+    WHERE
+        chn.nde_id = cn.id
+        AND chn.parent_hierarchy_id > 1
+        AND chn.CORP_ID = ${corpId}
+        AND chn.END_DATE IS NULL
+        
+  </select>
+
+  <select id="getCanViewPrivileges"> 
+    SELECT
+        unique(e.hn_id),
+        e.CASCADING 
+    FROM
+        haa_user_hierarchy_roles e,
+        (SELECT r.role_id
+           FROM haa_role_privileges rp, haa_roles r, haa_privileges p
+          WHERE rp.role_id =  r.role_id and rp.privilege_id =  p.privilege_id and p.description = 'VIEW-NODE') f
+    WHERE
+        e.role_id = f.role_id
+        AND e.user_id = #{loginUserId}
+  </select>
+  
+</mapper>

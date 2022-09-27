@@ -1,0 +1,10 @@
+#Pre Condition
+#Makesure /chart/prm/config folder has link to config files or copy config files there from ./config/*
+# Run the secret files manually
+# First Time run the below command to create the release
+helm install <releaseName> --set image.tag=<version> <chartName> -f <valuesYaml>
+Ex:- helm install prmrelease --set image.tag=v1.0 prm -f values-pt168.yaml
+
+#2 Next time onwards if you want to change the image on that release just use
+helm upgrade --install <releaseName> --set image.tag=<version> <chartName> -f <valuesYaml>
+

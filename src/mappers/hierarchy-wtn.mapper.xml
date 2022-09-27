@@ -1,0 +1,85 @@
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="hierarchyWtnMapper">
+
+    <select id ="findByFilters">
+        SELECT
+            TO_CHAR(cn.ID) AS NDE_ID,
+            cn.WTN,
+            cn.DESCRIPTION1,
+            cn.DESCRIPTION2,
+            cn.DESCRIPTION3,
+            cn.EXCLUDE_FROM_REPORTS_FLAG,
+            TO_CHAR(chn.ID) AS ID,
+            TO_CHAR(chn.HIR_ID) AS HIR_ID,
+            TO_CHAR(chn.CORP_ID) AS CORP_ID,         
+            TO_CHAR(chn.PARENT_HIERARCHY_ID) AS PARENT_HIERARCHY_ID,
+            chn.NTP_ID,
+            chn.NDE_NAME AS PARENT_NODE_NAME,            
+            cba.BTN
+        FROM
+            CERPT_NODES cn
+            LEFT JOIN CERPT_HIERARCHY_NODES chn ON cn.ID = chn.NDE_ID
+            LEFT JOIN CERPT_BILLING_ACCOUNTS cba ON cn.BAC_ID = cba.ID
+        WHERE
+            cn.ID = #{nodeId}
+            AND cn.END_DATE IS NULL
+            AND cn.NODE_TYPE = 'WTN'
+    </select>
+
+    <update id="updateRecord">
+        UPDATE CERPT_NODES
+        SET
+            <if test="dbEntity.excludeFromReportsFlag != undefined">             
+                EXCLUDE_FROM_REPORTS_FLAG = #{dbEntity.excludeFromReportsFlag},
+            </if>
+            <if test="dbEntity.description1 != undefined">
+                <choose>
+                    <when test="dbEntity.description1 == null">
+                        DESCRIPTION1 = NULL,
+                    </when>
+                    <otherwise>
+                        DESCRIPTION1 = q'[${dbEntity.description1}]',
+                    </otherwise>
+                </choose>
+            </if>
+            <if test="dbEntity.description2 != undefined">
+                <choose>
+                    <when test="dbEntity.description2 == null">
+                        DESCRIPTION2 = NULL,
+                    </when>
+                    <otherwise>
+                        DESCRIPTION2 = q'[${dbEntity.description2}]',
+                    </otherwise>
+                </choose>
+            </if>
+            <if test="dbEntity.description3 != undefined">
+                <choose>
+                    <when test="dbEntity.description3 == null">
+                        DESCRIPTION3 = NULL,
+                    </when>
+                    <otherwise>
+                        DESCRIPTION3 = q'[${dbEntity.description3}]',
+                    </otherwise>
+                </choose>
+            </if>            
+            LAST_UPDATE_NAME =  #{commonEntity.loginUser},
+            LAST_UPDATE_DATE = SYSDATE
+        WHERE
+            ID = #{commonEntity.nodeId}
+  </update>
+  <insert id="addRecord">
+        INSERT INTO CERPT_HIERARCHY_NODES 
+        (
+            ID, HIR_ID, CORP_ID, NTP_ID,
+            NDE_ID, EFFECTIVE_DATE, CREATE_DATE, CREATE_NAME,
+            NDE_NAME, LAST_UPDATE_DATE, LAST_UPDATE_NAME, PARENT_HIERARCHY_ID
+        )
+        VALUES (        
+            CERPT_HIERARCHY_NODES_ID_SEQ.nextval, #{hirId}, #{corpId}, #{ntpId},
+            #{nodeId}, SYSDATE, SYSDATE, #{loginUser},
+            q'[${parentNodeName}]', SYSDATE, #{loginUser}, #{parentHierarchyId}
+        )
+    </insert>
+</mapper>

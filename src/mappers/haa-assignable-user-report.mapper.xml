@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="haaAssignableUserReportMapper">
+  <select id="findByFilters">
+    SELECT
+      to_char(r.id) as id,
+      r.code,
+      lt.object_translated_value as description
+    FROM
+      CERPT_REPORTS r,
+      cerpt_language_translations lt
+    WHERE
+          r.state = 'ACTIVE'
+      and r.code = lt.object_id
+      and lt.lan_code = #{lan}
+    ORDER BY r.code    
+  </select>
+</mapper>

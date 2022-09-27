@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="haaUserReportMapper">
+  <select id="getReportingPeriod">
+    SELECT
+      corp.REPORTING_PERIOD
+    FROM
+      <if test="assignedReportId">
+        CERPT_HIERARCHY_NODE_REPORTS hnr,
+      </if>
+      CERPT_HIERARCHY_NODES hn,
+      CERPT_CORPORATIONS corp
+    WHERE      
+      <choose>
+          <when test="assignedReportId">
+              hnr.id = #{assignedReportId}                
+              AND hnr.hnde_id = hn.id
+          </when>
+          <otherwise>
+              hn.id = #{parentHnId}
+          </otherwise>
+      </choose>        
+      AND corp.id = hn.corp_id
+  </select>
+  <insert id="assignUserReport">
+    INSERT INTO CERPT_HIERARCHY_NODE_REPORTS (
+      ID,
+      USR_ID,
+      RPT_ID,
+      FMT_CODE,
+      LAN_CODE,
+      EFFECTIVE_DATE,
+      CREATE_DATE,
+      CREATE_NAME,
+      LAST_UPDATE_DATE,
+      LAST_UPDATE_NAME,
+      HNDE_ID,
+      DT_CODE,
+      PREDEFINED_RPT,
+      INTERACTIVE_RPT,
+      RAW_DATA_RPT
+    )
+    SELECT
+      CERPT_HIER_NODE_RPT_ID_SEQ.nextval,
+      USR_ID,
+      RPT_ID,
+      FMT_CODE,
+      LAN_CODE,
+      SYSDATE,
+      SYSDATE,
+      #{loginUser},
+      SYSDATE,
+      #{loginUser},
+      HNDE_ID,
+      'WEB',
+      'Y',
+      'N',
+      'N'
+    FROM (
+      <foreach collection="entities" index="index" item="entity" open="" separator="UNION ALL" close="">
+        SELECT 
+          #{entity.hierarchyNodeId} HNDE_ID,
+          #{entity.recipientUserId} USR_ID,
+          #{entity.reportId} RPT_ID,
+          #{entity.formatCode} FMT_CODE,
+          #{entity.reportLanCode} LAN_CODE
+          
+        FROM DUAL
+        where not EXISTS (
+          SELECT *
+          FROM CERPT_HIERARCHY_NODE_REPORTS 
+          WHERE
+            USR_ID = #{entity.recipientUserId}
+            AND RPT_ID = #{entity.reportId}
+            AND FMT_CODE = #{entity.formatCode}
+            AND LAN_CODE = #{entity.reportLanCode}
+            AND HNDE_ID = #{entity.hierarchyNodeId}
+            AND END_DATE IS NULL
+        ) 
+      </foreach>
+    )
+  </insert>
+  
+  <insert id="moveUserReport">
+    INSERT INTO CERPT_HIERARCHY_NODE_REPORTS (
+      ID,
+      USR_ID,
+      RPT_ID,
+      FMT_CODE,
+      LAN_CODE,
+      COPY_QTY,
+      EFFECTIVE_DATE,
+      CREATE_DATE,
+      CREATE_NAME,
+      LAST_UPDATE_DATE,
+      LAST_UPDATE_NAME,
+      DELETE_DATE,
+      DELETE_NAME,
+      HNDE_ID,
+      DT_CODE,
+      PREDEFINED_RPT,
+      INTERACTIVE_RPT,
+      RAW_DATA_RPT
+    )
+    SELECT
+      CERPT_HIER_NODE_RPT_ID_SEQ.nextval,
+      USR_ID,
+      RPT_ID,
+      FMT_CODE,
+      LAN_CODE,
+      COPY_QTY,
+      SYSDATE,
+      SYSDATE,
+      #{loginUser},
+      SYSDATE,
+      #{loginUser},
+      SYSDATE,
+      #{loginUser},
+      #{targetHndeId},
+      DT_CODE,
+      PREDEFINED_RPT,
+      INTERACTIVE_RPT,
+      RAW_DATA_RPT
+    FROM 
+      CERPT_HIERARCHY_NODE_REPORTS
+    WHERE
+      HNDE_ID = #{parentHnId}
+      AND END_DATE IS NULL
+  </insert>
+
+  <update id="unassignUserReport">
+    UPDATE CERPT_HIERARCHY_NODE_REPORTS
+    SET 
+      END_DATE = SYSDATE
+    WHERE
+      END_DATE is NULL AND 
+      <choose>
+        <when test="parentHnId">
+          HNDE_ID = #{parentHnId}
+        </when>
+        <otherwise>
+        (
+          <foreach collection="entities" index="index" item="entity" open="" separator="OR" close="">
+              ID = #{entity.assignedReportId}
+          </foreach>
+        )
+        </otherwise>
+      </choose>
+  </update>
+
+  <update id="updateRecord">
+    UPDATE CERPT_HIERARCHY_NODE_REPORTS
+    SET
+      <if test="dbEntity.recipientUserId != undefined">             
+        USR_ID = #{dbEntity.recipientUserId},
+      </if>
+      <if test="dbEntity.formatCode != undefined">             
+        FMT_CODE = #{dbEntity.formatCode},
+      </if>
+      <if test="dbEntity.reportLanCode != undefined">             
+        LAN_CODE = #{dbEntity.reportLanCode},
+      </if>
+      LAST_UPDATE_NAME =  #{commonEntity.loginUser},
+      LAST_UPDATE_DATE = SYSDATE
+    WHERE
+      ID = #{commonEntity.assignedReportId}
+  </update>
+</mapper>

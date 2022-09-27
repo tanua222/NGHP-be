@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="haaUserRoleMgtMapper">
+
+  <sql id="haa_constants">
+    g_DateFormatString      	Constant    VarChar2(21):= 'YYYY/MM/DD HH24:MI:SS';
+  </sql>
+
+  <sql id="has_roles">
+    Function Has_Roles (
+                        p_LoginUserId           In      Number,
+                        p_HierNodeId            In      Number)
+    Return Number Is
+      l_Count     Number(38);
+    Begin
+        Select  SIGN(Count(*))
+        Into    l_Count
+        From    Haa_User_Hierarchy_Roles
+        Where   user_id = p_LoginUserId
+        And     hn_id   = p_HierNodeId;
+        Return l_Count;
+    End Has_Roles;
+  </sql>
+
+  <sql id="check_user_concurrency">
+    Function Check_User_Concurrency (
+                        p_AssignUserId          In      Number,
+                        p_LastUpdateDate        In      VarChar2 Default Null)
+    Return Number
+    Is
+
+    l_LastUpdateDate        VarChar2(21);
+    l_EndDate               Date;
+
+    Begin
+
+        Select  To_Char(last_update_date, g_DateFormatString),
+                end_date
+        Into    l_LastUpdateDate,
+                l_EndDate
+        From    Cerpt_Users
+        Where   id = p_AssignUserId;
+
+        If (l_LastUpdateDate != NVL(p_LastUpdateDate, l_LastUpdateDate)) Then
+            raise_application_error(-20109, 'User record has been modified by another user.');
+        End If;
+
+        If l_EndDate Is Not Null Then
+            raise_application_error(-20110, 'User account expired.');
+        End If;
+
+        Return 0;
+
+    End;
+  </sql>
+
+  <sql id="update_user">
+    Function Update_User (
+                        p_AssignUserId          In      Number,
+                        p_LoginUserName         In      VarChar2,
+                        p_LastUpdateDate        In      VarChar2 Default Null)
+    Return VarChar2
+    Is
+
+    l_Sysdate        Date;
+
+    Begin
+
+        If (Check_User_Concurrency (p_AssignUserId, p_LastUpdateDate) = 0) Then
+
+            Select 	Sysdate
+            Into	l_Sysdate
+            From 	Dual;
+
+            Update  Cerpt_Users
+            Set     last_update_date = l_Sysdate,
+                    last_update_name = p_LoginUserName
+            Where   id = p_AssignUserId;
+
+            Return To_Char(l_Sysdate, g_DateFormatString);
+
+        End If;
+
+    End Update_User;
+  </sql>
+
+  <sql id="assign_user_to_node">
+    Procedure Assign_User_To_Node (
+                        p_AssignUserId          In      Number,
+                        p_HierNodeId            In      Number,
+                        p_RoleId                In      Number,
+                        p_Cascading             In      Char)
+    Is
+    Begin
+      Insert Into HAA_User_Hierarchy_Roles (user_id, hn_id, role_id, cascading, last_update_date)
+        Values (p_AssignUserId, p_HierNodeId, p_RoleId, p_Cascading, Sysdate);
+
+      Insert Into HAA_User_Hierarchy_Roles(user_id, hn_id, role_id, cascading, last_update_date)
+        Select x.user_id, x.hn_id, x.role_id, x.cascading, Sysdate
+        From (
+          Select  p_AssignUserId As user_id, chn.parent_hierarchy_id As hn_id, 999 As role_id, 'N' As cascading
+          From    cerpt_hierarchy_nodes chn
+          Where   chn.ntp_id > 5		     
+          Start With chn.id = p_HierNodeId
+          Connect By chn.id = Prior chn.parent_hierarchy_id
+          
+          Minus 
+
+          Select  chn.user_id, chn.hn_id, chn.Role_id, chn.cascading
+          From    haa_user_hierarchy_roles  chn
+          Where   chn.user_id = p_AssignUserId
+          And     chn.role_id = 999
+          ) x;
+
+    End Assign_User_To_Node;
+  </sql>
+
+  <sql id="unassign_user_from_node">
+    Procedure Unassign_User_From_Node (
+        p_AssignUserId          In      Number,
+        p_HierNodeId            In      Number)
+    Is
+        CURSOR ancestor_cursor IS
+        SELECT chn.ID, chn.parent_hierarchy_id, chn.ntp_id
+        FROM   cerpt_hierarchy_nodes chn
+        WHERE  chn.ntp_id > 5 
+        START WITH chn.ID = p_hiernodeid
+        CONNECT BY chn.ID = PRIOR chn.parent_hierarchy_id;
+
+        ancestor_record ancestor_cursor%rowtype;
+
+    BEGIN
+
+        DELETE FROM haa_user_hierarchy_roles
+        WHERE   user_id = p_assignuserid
+        AND     hn_id = p_hiernodeid;
+
+        IF NOT ancestor_cursor%isopen THEN
+          OPEN ancestor_cursor;
+        END IF;
+
+        FETCH ancestor_cursor INTO ancestor_record;
+
+        WHILE ancestor_cursor%found LOOP
+
+            DELETE haa_user_hierarchy_roles
+            WHERE  hn_id   = ancestor_record.parent_hierarchy_id
+            AND    user_id = p_assignuserid
+            AND    role_id = 999
+            AND NOT EXISTS
+                (
+                    SELECT chn.ID, chn.nde_name, hahr.role_id
+                    FROM   cerpt_hierarchy_nodes chn
+                          ,haa_user_hierarchy_roles hahr
+                    WHERE  chn.ID = hahr.hn_id        
+                    AND    chn.parent_hierarchy_id = ancestor_record.parent_hierarchy_id
+                    AND    hahr.user_id = p_assignuserid
+                );
+
+            FETCH ancestor_cursor INTO ancestor_record;
+
+        END LOOP;
+
+        CLOSE ancestor_cursor;
+
+    END;
+  </sql>
+
+  <sql id="unassign_all_roles">
+    PROCEDURE Unassign_All_Roles(p_AssignUserId  NUMBER, p_HierNodeId NUMBER, p_LoginUserName VARCHAR2, 
+        p_lastUpdateDate OUT VARCHAR2) IS  
+        p_hasUserConcurrency    NUMBER;
+    BEGIN
+        p_lastUpdateDate := Update_User(p_AssignUserId, p_LoginUserName);
+        Unassign_User_From_Node(p_AssignUserId, p_HierNodeId);
+        p_hasUserConcurrency := Check_User_Concurrency(p_AssignUserId, p_lastUpdateDate);
+    END;
+  </sql>
+
+  <update id="assignUserToNode" statementType="CALLABLE">
+    DECLARE
+        p_LoginUserName VARCHAR2(40) := #{loginUser};
+        p_AssignUserId  NUMBER := ${userId};
+        p_HierNodeId    NUMBER := ${parentHnId};
+        p_lastUpdateDate VARCHAR2(21);  
+        p_hasUserConcurrency    NUMBER;
+        
+        <include refid="haa_constants"/>
+        <include refid="check_user_concurrency"/>
+        <include refid="update_user"/>
+        <include refid="unassign_user_from_node"/>
+        <include refid="unassign_all_roles"/>
+        <include refid="has_roles"/>
+        <include refid="assign_user_to_node"/>
+        
+    BEGIN
+      
+        IF (Has_Roles(p_AssignUserId, p_HierNodeId) = 1) THEN
+            raise_application_error(-20109, 'User record has been modified by another user');
+        END IF;
+        
+        Unassign_All_Roles(p_AssignUserId, p_HierNodeId, p_LoginUserName, p_lastUpdateDate);
+                
+        <foreach collection="entities" item="entity">
+          Assign_User_To_Node(p_AssignUserId, p_HierNodeId, ${entity.roleId}, #{entity.cascadeInd});
+        </foreach>
+        
+        p_hasUserConcurrency := Check_User_Concurrency(p_AssignUserId, p_lastUpdateDate);
+
+    END;
+  </update>
+
+  <update id="unassignUserFromNode" statementType="CALLABLE">
+    DECLARE
+        p_LoginUserName VARCHAR2(40) := #{loginUser};
+        p_lastUpdateDate VARCHAR2(21);
+        
+        <include refid="haa_constants"/>
+        <include refid="check_user_concurrency"/>
+        <include refid="update_user"/>
+        <include refid="unassign_user_from_node"/>
+        <include refid="unassign_all_roles"/>
+        
+    BEGIN
+        <foreach collection="entities" item="entity">
+          Unassign_All_Roles(${entity.userId}, ${entity.parentHierarchyNodeId}, p_LoginUserName, p_lastUpdateDate);
+        </foreach>
+    END;
+  </update>
+
+  <update id="updateAssignedUserRoleInNode" statementType="CALLABLE">
+    DECLARE
+        p_LoginUserName VARCHAR2(40) := #{loginUser};
+        p_AssignUserId  NUMBER := ${userId};
+        p_HierNodeId    NUMBER := ${parentHnId};
+        p_lastUpdateDate VARCHAR2(21);
+        
+        <include refid="haa_constants"/>
+        <include refid="check_user_concurrency"/>
+        <include refid="update_user"/>
+        <include refid="unassign_user_from_node"/>
+        <include refid="unassign_all_roles"/>
+        <include refid="assign_user_to_node"/>
+        
+    BEGIN
+        Unassign_All_Roles(p_AssignUserId, p_HierNodeId, p_LoginUserName, p_lastUpdateDate);
+                
+        <foreach collection="entities" item="entity">
+          Assign_User_To_Node(p_AssignUserId, p_HierNodeId, ${entity.roleId}, #{entity.cascadeInd});
+        </foreach>
+
+    END;
+  </update>
+
+  <update id="moveUserRoles">
+    UPDATE haa_user_hierarchy_roles
+    SET 
+      HN_ID = #{targetHndeId}
+    WHERE
+      HN_ID = #{parentHnId}      
+  </update>
+</mapper>

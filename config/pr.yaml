@@ -1,0 +1,25 @@
+fileName: pr.yaml
+kongNpEnv: pr
+dbConfig:
+  cerptAdmin:
+    connectString: iedm3311da.ent.agt.ab.ca:41289/IVSP
+applicationApi:
+  userInformation:
+    baseUrl: https://apigw-pr.tsl.telus.com/service/ivsUserInformation/v1
+authentication:
+  enabled: true
+  identityProviderDomains:
+    teamMember:
+      issuer: 'https://teamsso.telus.com'
+      apis:
+        token:
+          endPoint: https://apigw-pr.tsl.telus.com/token
+        jwksAccessToken:
+          endPoint: https://apigw-pr.tsl.telus.com/jwks
+    customer:
+      issuer: 'https://telusidentity.telus.com'
+      apis:
+        token:
+          endPoint: https://apigw-pr.telus.com/ci/token
+        jwksAccessToken:
+          endPoint: https://apigw-pr.telus.com/ci/jwks

@@ -1,0 +1,68 @@
+import ResponseDto from '../dto/response.dto';
+import BaseEntity from './base.entity';
+const transformer = require('json-transformer-node');
+
+export default class HomePageStatisticsEntity extends BaseEntity {
+  rn: string;
+  resultCount: string;
+  clecFilename: string;
+  ediFilename: string;
+  dtDownloaded: string;
+  dtDownloadedPstFmt: string;
+  name: string;
+  clecProv: string;
+  new: string;
+  awaitingPrecheck: string;
+  awaitingBlifToDirection: string;
+  lockedByAutomation: string;
+  failedBlifToDirection: string;
+  awaitingAckAccepted: string;
+  awaitingAckRejected: string;
+  totalReceived: string;
+  totalProcessed: string;
+  // TODO: Do we need to define all type?
+
+  static transformer = {
+    mapping: {
+      item: {
+        rn: 'RN',
+        resultCount: 'RESULT_COUNT',
+        clecFilename: 'CLEC_FILENAME',
+        ediFilename: 'EDI_FILENAME',
+        dtDownloaded: 'DT_DOWNLOADED',
+        dtDownloadedPstFmt: 'DT_DOWNLOADED_PST_FMT',
+        name: 'NAME',
+        clecProv: 'CLEC_PROV',
+        new: 'NEW',
+        awaitingPrecheck: 'AWAITING_PRECHECK',
+        awaitingBlifToDirection: 'AWAITING_BLIF_TO_DIRECTION',
+        lockedByAutomation: 'LOCKED_BY_AUTOMATION',
+        failedBlifToDirection: 'FAILED_BLIF_TO_DIRECTION',
+        awaitingAckAccepted: 'AWAITING_ACK_ACCEPTED',
+        awaitingAckRejected: 'AWAITING_ACK_REJECTED',
+        totalReceived: 'TOTAL_RECEIVED',
+        totalProcessed: 'TOTAL_PROCESSED'
+      },
+    },
+  };
+
+  static transformerArray = {
+    mapping: {
+      item: {
+        result: [
+          {
+            list: 'data',
+            item: HomePageStatisticsEntity.transformer.mapping.item,
+          },
+        ],
+      },
+    },
+  };
+
+  static transform(json: any): HomePageStatisticsEntity[] {
+    if (Array.isArray(json)) {
+      return transformer.transform({ data: json }, HomePageStatisticsEntity.transformerArray).result;
+    }
+    throw ResponseDto.internalError('Array is expected');
+  }
+}

@@ -1,0 +1,133 @@
+{
+	"info": {
+		"_postman_id": "cc9501dc-3395-42ec-a919-351582e2c948",
+		"name": "IVS HAA AssignableTollfreeEntity",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "getAssignableTollfreeEntity",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept-Language",
+						"value": "en-CA",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseHierarchyUrl}}/tollFreeNumberEntity/assignable?parentHierarchyNodeId=600004017",
+					"host": [
+						"{{baseHierarchyUrl}}"
+					],
+					"path": [
+						"tollFreeNumberEntity",
+						"assignable"
+					],
+					"query": [
+						{
+							"key": "parentHierarchyNodeId",
+							"value": "600004017",
+							"description": "node 1"
+						},
+						{
+							"key": "parentHierarchyNodeId",
+							"value": "600004383",
+							"description": "node 4",
+							"disabled": true
+						},
+						{
+							"key": "tollfreeNumber",
+							"value": "123",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getAssignableTollfreeEntity incorrect hnid Copy",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept-Language",
+						"value": "en-CA",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseHierarchyUrl}}/tollFreeNumberEntity/assignable?parentHierarchyNodeId=600004376",
+					"host": [
+						"{{baseHierarchyUrl}}"
+					],
+					"path": [
+						"tollFreeNumberEntity",
+						"assignable"
+					],
+					"query": [
+						{
+							"key": "corporationId",
+							"value": "600002340",
+							"disabled": true
+						},
+						{
+							"key": "parentHierarchyNodeId",
+							"value": "600004376",
+							"description": "node 4"
+						},
+						{
+							"key": "tollfreeNumber",
+							"value": "123",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getAssignableTollfreeEntity pagination Copy",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseHierarchyUrl}}/tollFreeNumberEntity/assignable?corporationId=600002340&parentHierarchyNodeId=600004383&limit=3&offset=0&sort=-tollfreeNumber",
+					"host": [
+						"{{baseHierarchyUrl}}"
+					],
+					"path": [
+						"tollFreeNumberEntity",
+						"assignable"
+					],
+					"query": [
+						{
+							"key": "corporationId",
+							"value": "600002340"
+						},
+						{
+							"key": "parentHierarchyNodeId",
+							"value": "600004383",
+							"description": "node 4"
+						},
+						{
+							"key": "limit",
+							"value": "3"
+						},
+						{
+							"key": "offset",
+							"value": "0"
+						},
+						{
+							"key": "sort",
+							"value": "-tollfreeNumber"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

@@ -1,0 +1,203 @@
+{
+	"info": {
+		"_postman_id": "5971364e-0765-4639-9f59-82fd779ff95f",
+		"name": "assignabletollfree",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "basic-corp+ no pag",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/tollFreeNumberEntity?corporationId=600002340&uuid=x228677",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"tollFreeNumberEntity"
+					],
+					"query": [
+						{
+							"key": "corporationId",
+							"value": "600002340"
+						},
+						{
+							"key": "uuid",
+							"value": "x228677"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "pagination",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/tollFreeNumberEntity?corporationId=600002340&uuid=x228677&limit=3&sort=entityNodeId&offset=1",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"tollFreeNumberEntity"
+					],
+					"query": [
+						{
+							"key": "corporationId",
+							"value": "600002340"
+						},
+						{
+							"key": "uuid",
+							"value": "x228677"
+						},
+						{
+							"key": "limit",
+							"value": "3"
+						},
+						{
+							"key": "sort",
+							"value": "entityNodeId"
+						},
+						{
+							"key": "offset",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "pagination -/multi sort",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/tollFreeNumberEntity?corporationId=600002340&uuid=x228677&limit=3&sort=-entityNodeId",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"tollFreeNumberEntity"
+					],
+					"query": [
+						{
+							"key": "corporationId",
+							"value": "600002340"
+						},
+						{
+							"key": "uuid",
+							"value": "x228677"
+						},
+						{
+							"key": "limit",
+							"value": "3"
+						},
+						{
+							"key": "sort",
+							"value": "-entityNodeId"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "params",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/tollFreeNumberEntity?corporationId=600002340&uuid=x228677",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"tollFreeNumberEntity"
+					],
+					"query": [
+						{
+							"key": "corporationId",
+							"value": "600002340"
+						},
+						{
+							"key": "uuid",
+							"value": "x228677"
+						},
+						{
+							"key": "hierarchyNodeId",
+							"value": "600004324",
+							"disabled": true
+						},
+						{
+							"key": "hierarchyNodeName",
+							"value": "Default",
+							"disabled": true
+						},
+						{
+							"key": "hierarchyNodeLevel",
+							"value": "2",
+							"disabled": true
+						},
+						{
+							"key": "tollfreeNumber",
+							"value": "8003229451",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "params + page",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/tollFreeNumberEntity?corporationId=600002340&uuid=x228677&hierarchyNodeLevel=2",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"tollFreeNumberEntity"
+					],
+					"query": [
+						{
+							"key": "corporationId",
+							"value": "600002340"
+						},
+						{
+							"key": "uuid",
+							"value": "x228677"
+						},
+						{
+							"key": "hierarchyNodeId",
+							"value": "600004017",
+							"disabled": true
+						},
+						{
+							"key": "hierarchyNodeName",
+							"value": "Node 1",
+							"disabled": true
+						},
+						{
+							"key": "hierarchyNodeLevel",
+							"value": "2"
+						},
+						{
+							"key": "limit",
+							"value": "3",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

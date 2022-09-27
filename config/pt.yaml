@@ -1,0 +1,5 @@
+fileName: pt.yaml
+kongNpEnv: it01
+dbConfig:
+  cerptAdmin:
+    connectString: iedm3315da.ent.agt.ab.ca:41522/IVST

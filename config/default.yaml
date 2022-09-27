@@ -1,0 +1,84 @@
+fileName: default.yaml
+kongNpEnv: dv01
+info:
+  tag: ${IMAGE_TAG}
+  build:
+    build: ${BUILD_DT}
+server:
+  contextPath: /ivsHierarchy/v1
+  port: 3006
+log:
+  level: 'debug'
+dbConfig:
+  cerptAdmin:
+    enabled: false
+    user: APPBLIF_U1_PT
+    connectString: btln002624.corp.ads:41521/VPOPDSPT
+    poolAlias: cerptAdmin
+    poolIncrement: 1
+    # if pool max is increased , please use UV_THREADPOOL_SIZE in start command , check package.json
+    # UV_THREADPOOL_SIZE should be poolMax + some number
+    poolMax: 4
+    poolMin: 0
+    poolTimeout: 4
+    drainTime: 10
+    poolPingInterval: 0
+    enableStatistics: true
+ssoConfig:
+  ssoUrl: https://teamsso-dv.tsl.telus.com/idp/startSSO.ping?PartnerSpId=ivs
+  sloUrl: https://teamsso-dv.tsl.telus.com/idp/startSLO.ping?PartnerSpId=ivs
+  callBackUrl: /user/login
+  loginUrl: /user/login
+  issuer: https://teamsso-dv.tsl.telus.com
+  bypassSso: false
+pagination:
+  defaultOffset: 0
+  defaultLimit: 25
+dbDateTimeZoneConfig:
+  serverTimeZone: 'UTC'
+  dbTimeZoneName: 'America/Denver'
+oasValidation:
+  validateResponse: false
+  validateRequest: true
+applicationApi:
+  userInformation:
+    baseUrl: https://apigw-st.tsl.telus.com/service/ivsUserInformation/v1
+    authorization:
+      grant_type: client_credentials
+      scope: 1828
+callingApplication:
+  ldors:
+    clientId: 665f883d-744f-4747-aeaf-8c704b33a394
+  rebiller:
+    clientId: b52756be-e6f2-4772-ab42-3174f9d29cf2
+authentication:
+  enabled: true
+  identityProviderDomains:
+    teamMember:
+      name: 'teamMember'
+      enabled: true
+      allowedScopes: ['1827']
+      issuer: 'https://teamsso-its04.telus.com'
+      audience: 'kong'
+      jwksRequestsPerMinute: 10
+      apis:
+        token:
+          endPoint: https://apigw-st.tsl.telus.com/st/token
+        jwksAccessToken:
+          endPoint: https://apigw-st.tsl.telus.com/st/jwks
+    customer:
+      name: 'customer'
+      enabled: true
+      allowedScopes: ['1827']
+      issuer: 'https://telusidentity-pp.telus.com'
+      audience: 'kong'
+      jwksRequestsPerMinute: 10
+      apis:
+        token:
+          endPoint: https://apigw-st.tsl.telus.com/st/ci/token
+        jwksAccessToken:
+          endPoint: https://apigw-st.tsl.telus.com/st/ci/jwks
+hierarchyExtract:
+  columns: ['Corp ID','Node1 Name','Node2 Name','Node3 Name','Node4 Name','Node5 Name','Node6 Name','Node7 Name','Node8 Name','Node9 Name']
+enableQueryTime:
+  enabled: true

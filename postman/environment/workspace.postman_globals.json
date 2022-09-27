@@ -1,0 +1,40 @@
+{
+	"id": "022a8dee-9e21-48ab-8786-5222e669eb68",
+	"values": [
+		{
+			"key": "authUrl",
+			"value": "https://teamsso-its04.telus.com/as/authorization.oauth2",
+			"enabled": true
+		},
+		{
+			"key": "accessTokenUrl",
+			"value": "https://apigw-st.tsl.telus.com/st/token",
+			"enabled": true
+		},
+		{
+			"key": "clientId",
+			"value": "cd40f18c-5fe6-449d-8e1c-3efa51a2a0ad",
+			"enabled": true
+		},
+		{
+			"key": "clientSecret",
+			"value": "e13121d4-2af8-489d-bd80-b322ef0e060dc0cc300b-d742-42fd-b994-12411f4cba53",
+			"enabled": true
+		},
+		{
+			"key": "scope",
+			"value": "1821 1822 1823 1824 1825 1826 1828",
+			"enabled": true
+		},
+		{
+			"key": "callbackUrl",
+			"value": "http://localhost:3000/ivs/home",
+			"type": "default",
+			"enabled": true
+		}
+	],
+	"name": "Globals",
+	"_postman_variable_scope": "globals",
+	"_postman_exported_at": "2022-01-21T17:33:17.842Z",
+	"_postman_exported_using": "Postman/9.8.2"
+}

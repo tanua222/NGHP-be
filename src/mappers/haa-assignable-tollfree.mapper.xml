@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="haaAssignableTollfreeMapper">
+  <select id="findByFilters">
+    select
+      to_char(e.entity_seq_id) as entity_seq_id,
+      to_char(tfsub.tf_number) as tf_number,
+      tfsub.tf_vanity
+    from
+      haa_entities e,
+      ttf_subscription tfsub
+    where
+      e.corp_id = (
+          select corp_id from cerpt_hierarchy_nodes where id = #{parentHnId}
+      )
+      and e.entity_type = 'TFNUM'
+      and tfsub.tf_subscription_id = e.entity_id
+      <!-- web indicator should be true for it to show up on hierarchy -->
+      and tfsub.conf_mgmt = 1
+      and e.entity_seq_id not in (
+        select
+          entity_seq_id
+        from
+          haa_node_entities
+        WHERE                    
+          hn_id = #{parentHnId}
+          and end_date is null
+      )
+      <if test="tollfreeNumber">
+        and tfsub.tf_number like CONCAT('%',CONCAT(#{tollfreeNumber},'%'))
+      </if>
+      <if test="entitySequenceId">
+        and e.entity_seq_id = #{entitySequenceId}
+      </if>
+  </select>
+
+  <select id = "findByFiltersWithPagination">
+      WITH RECORDSET AS (
+         <include refid="findByFilters"/>
+      ), 
+      NUMBERED AS (
+         SELECT 
+         ROW_NUMBER() 
+         OVER (  
+            <foreach collection="sortConditions" index="index" item="item" open="ORDER BY " separator="," close="">
+       			${item}
+  			   </foreach>
+         ) RN, 
+         RECORDSET.*
+         FROM RECORDSET)
+      SELECT
+         CEIL((SELECT COUNT(*) FROM NUMBERED) / ${paginationParam.limit}) TOTAL_PAGES, 
+         (SELECT COUNT(*) FROM NUMBERED) TOTAL_ROWS,
+         NUMBERED.*
+      FROM NUMBERED
+      WHERE RN BETWEEN (${paginationParam.offset}+1) AND (${paginationParam.offset}+${paginationParam.limit})
+   </select>
+</mapper>

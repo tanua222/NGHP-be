@@ -1,0 +1,39 @@
+{
+	"info": {
+		"_postman_id": "9e9ae005-1f07-4e3f-8b45-6a828d630ed4",
+		"name": "IVS HAA User Report Detail",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "getUserReportDetail",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept-Language",
+						"value": "en-CA",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseHierarchyUrl}}/userReport/:assignedReportId",
+					"host": [
+						"{{baseHierarchyUrl}}"
+					],
+					"path": [
+						"userReport",
+						":assignedReportId"
+					],
+					"variable": [
+						{
+							"key": "assignedReportId",
+							"value": "600002136"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

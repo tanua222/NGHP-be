@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="haaIdCodeSetMapper">
+
+  
+  <select id="findAssignableByFilters">
+    SELECT
+        a.iss_code                             IDCODESET_CODE,
+        a.iss_desc                             IDCODESET_DESCRIPTION, 
+        a.iss_type                             IDCODESET_TYPE,
+        a.isn_length                           IDCODESET_LENGTH,
+        to_char(c.create_date, 'yyyy-mm-dd')   effective_date,
+        to_char(c.end_date, 'yyyy-mm-dd')      end_date, 
+        c.entity_seq_id
+    FROM
+        tid_code_set     a,
+        cerpt_hierarchy_nodes b,
+        haa_entities          c
+    WHERE
+            b.id = ${hnId}
+        AND a.con_id = b.corp_id
+        AND to_char(a.isn_id) = c.entity_id
+        AND c.corp_id = a.con_id
+        AND c.entity_type = 'ICSET'
+        <if test="idCodeSetCode">
+          AND lower(a.iss_code) LIKE CONCAT('%', CONCAT(lower(q'[${idCodeSetCode}]'), '%')) 
+        </if>
+        <if test="idCodeSetDescription">
+          AND lower(a.iss_desc) LIKE  CONCAT('%', CONCAT(lower(q'[${idCodeSetDescription}]'), '%')) 
+        </if>
+        AND to_char(a.isn_id) NOT IN (
+            SELECT
+                isn_id
+            FROM
+                tid_code_set a1, haa_node_entities b1, haa_entities      c1
+            WHERE
+                    b1.hn_id = ${hnId}
+                AND b1.entity_seq_id = c1.entity_seq_id
+                AND a1.isn_id = c1.entity_id
+                AND c1.entity_type = 'ICSET'
+                and b1.end_date is null
+        )
+  </select>
+
+  <select id = "findAssignableByFiltersWithPagination">
+      WITH RECORDSET AS (
+         <include refid="findAssignableByFilters"/>
+      ), 
+      NUMBERED AS (
+         SELECT 
+         ROW_NUMBER() 
+         OVER (  
+            <foreach collection="sortConditions" index="index" item="item" open="ORDER BY " separator="," close="">
+       			${item} 
+  			   </foreach>
+         ) RN, 
+         RECORDSET.*
+         FROM RECORDSET)
+      SELECT
+         CEIL((SELECT COUNT(*) FROM NUMBERED) / ${paginationParam.limit}) TOTAL_PAGES, 
+         (SELECT COUNT(*) FROM NUMBERED) TOTAL_ROWS,
+         NUMBERED.*
+      FROM NUMBERED
+      WHERE RN BETWEEN (${paginationParam.offset}+1) AND (${paginationParam.offset}+${paginationParam.limit})
+   </select>
+
+</mapper>

@@ -1,0 +1,217 @@
+{
+	"info": {
+		"_postman_id": "b4be51a4-e1f7-437f-b7ee-a9f71383dfbc",
+		"name": "IVS HAA AssignableAccountCodeSetEntity",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "basic-corp+ no pag",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/accountCodeSetEntity?corporationId=600002340&uuid=x228677",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"accountCodeSetEntity"
+					],
+					"query": [
+						{
+							"key": "corporationId",
+							"value": "600002340"
+						},
+						{
+							"key": "uuid",
+							"value": "x228677"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "pagination",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/accountCodeSetEntity?corporationId=600002340&uuid=x228677&limit=3&sort=entityNodeId,accountCodeSetCode&offset=1",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"accountCodeSetEntity"
+					],
+					"query": [
+						{
+							"key": "corporationId",
+							"value": "600002340"
+						},
+						{
+							"key": "uuid",
+							"value": "x228677"
+						},
+						{
+							"key": "limit",
+							"value": "3"
+						},
+						{
+							"key": "sort",
+							"value": "entityNodeId,accountCodeSetCode"
+						},
+						{
+							"key": "offset",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "pagination -/multi sort",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/accountCodeSetEntity?corporationId=600002340&uuid=x228677&limit=3&sort=-entityNodeId",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"accountCodeSetEntity"
+					],
+					"query": [
+						{
+							"key": "corporationId",
+							"value": "600002340"
+						},
+						{
+							"key": "uuid",
+							"value": "x228677"
+						},
+						{
+							"key": "limit",
+							"value": "3"
+						},
+						{
+							"key": "sort",
+							"value": "-entityNodeId"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "params",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/accountCodeSetEntity?corporationId=600002340&uuid=x228677&hierarchyNodeName=node",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"accountCodeSetEntity"
+					],
+					"query": [
+						{
+							"key": "corporationId",
+							"value": "600002340"
+						},
+						{
+							"key": "uuid",
+							"value": "x228677"
+						},
+						{
+							"key": "accountCodeSetCode",
+							"value": "AC003",
+							"disabled": true
+						},
+						{
+							"key": "accountCodeSetDescription",
+							"value": "te",
+							"disabled": true
+						},
+						{
+							"key": "hierarchyNodeId",
+							"value": "600004324",
+							"disabled": true
+						},
+						{
+							"key": "hierarchyNodeLevel",
+							"value": "6",
+							"disabled": true
+						},
+						{
+							"key": "hierarchyNodeName",
+							"value": "node"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "params + page",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/accountCodeSetEntity?corporationId=600002340&uuid=x228677&hierarchyNodeName=Node 1",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"accountCodeSetEntity"
+					],
+					"query": [
+						{
+							"key": "corporationId",
+							"value": "600002340"
+						},
+						{
+							"key": "uuid",
+							"value": "x228677"
+						},
+						{
+							"key": "accountCodeSetCode",
+							"value": "AC003",
+							"disabled": true
+						},
+						{
+							"key": "accountCodeSetDescription",
+							"value": "test",
+							"disabled": true
+						},
+						{
+							"key": "hierarchyNodeId",
+							"value": "600004017",
+							"disabled": true
+						},
+						{
+							"key": "hierarchyNodeName",
+							"value": "Node 1"
+						},
+						{
+							"key": "hierarchyNodeLevel",
+							"value": "6",
+							"disabled": true
+						},
+						{
+							"key": "limit",
+							"value": "3",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

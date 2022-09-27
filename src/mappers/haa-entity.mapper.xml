@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="haaEntityMapper">
+
+<insert id="assign">
+    INSERT INTO HAA_NODE_ENTITIES (
+      ENTITY_NODE_ID,
+      HN_ID,
+      ENTITY_SEQ_ID,
+      EFFECTIVE_DATE,
+      CREATE_DATE,
+      LAST_UPDATE_DATE
+    )
+    SELECT
+      HAA_NODE_ENTITIES_ID_SEQ.nextval,
+      HN_ID,
+      ENTITY_SEQ_ID,
+      EFFECTIVE_DATE,
+      CREATE_DATE,
+      LAST_UPDATE_DATE
+    FROM (
+      <foreach collection="entities" index="index" item="entity" open="" separator="UNION ALL" close="">
+        SELECT 
+          #{entity.hierarchyNodeId} as HN_ID,
+          #{entity.entitySequenceId} as ENTITY_SEQ_ID,
+          SYSDATE as EFFECTIVE_DATE,
+          SYSDATE as CREATE_DATE,
+          SYSDATE as LAST_UPDATE_DATE
+        FROM DUAL
+        where not EXISTS (
+          SELECT *
+          FROM HAA_NODE_ENTITIES 
+          WHERE
+            HN_ID = #{entity.hierarchyNodeId}
+            AND ENTITY_SEQ_ID = #{entity.entitySequenceId}
+            AND END_DATE is null
+        ) AND #{entity.hierarchyNodeId} in (
+            select id from cerpt_hierarchy_nodes where corp_id = (
+            select corp_id from haa_entities
+            where ENTITY_SEQ_ID = #{entity.entitySequenceId})
+        ) 
+      </foreach>
+    )
+  </insert>   
+  <insert id="moveNodeEntities">
+    INSERT INTO HAA_NODE_ENTITIES (
+      ENTITY_NODE_ID,
+      HN_ID,
+      ENTITY_SEQ_ID,
+      EFFECTIVE_DATE,
+      CREATE_DATE,
+      LAST_UPDATE_DATE
+    )
+    SELECT
+      HAA_NODE_ENTITIES_ID_SEQ.nextval,
+      #{targetHndeId},
+      ENTITY_SEQ_ID,
+      SYSDATE,
+      SYSDATE,
+      SYSDATE
+    FROM 
+      HAA_NODE_ENTITIES
+    WHERE
+      HN_ID = #{parentHnId}
+      AND END_DATE IS NULL
+  </insert>
+  
+<update id="unassign">
+    UPDATE HAA_NODE_ENTITIES
+    SET 
+      END_DATE = SYSDATE
+    WHERE
+      END_DATE is NULL AND 
+      <choose>
+        <when test="parentHnId">
+          HN_ID = #{parentHnId}
+        </when>
+        <otherwise>        
+         ENTITY_NODE_ID  IN 
+        <foreach collection="entities" index="index" item="entity" open="(" separator="," close=")">
+           #{entity.entityNodeId}
+        </foreach> 
+        </otherwise>
+      </choose>       
+  </update>
+
+    <select id="findNodeIdListByEntityNodeIdList">
+    SELECT
+        to_char(a.entity_node_id)               entity_node_id,
+        to_char(a.hn_id)                        hn_id,
+        to_char(a.effective_date, 'yyyy-mm-dd') effective_date
+    FROM
+        haa_node_entities     a
+    WHERE
+        a.end_date is null
+      <if test="entityNodeIdList">
+        <foreach collection="entityNodeIdList" item="item" open="and (" separator="or" close=")">
+          a.entity_node_id = #{item}
+        </foreach>
+      </if>
+  </select>
+
+  <select id="findBySeqId">
+    select
+      to_char(e.entity_seq_id) as entity_seq_id
+    from
+      haa_entities e
+    where    
+      e.entity_type = #{entityType}
+      and e.entity_seq_id = #{entitySequenceId}
+  </select>
+
+</mapper>

@@ -1,0 +1,63 @@
+{
+	"info": {
+		"_postman_id": "ed897b30-df3f-4a4e-82da-285fd1888adc",
+		"name": "IVS HAA Assign Tollfree Number",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "assignTollfreeNumber",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "[\r\n    {\r\n        \"parentHierarchyNodeId\": \"600004017\",\r\n        \"entitySequenceId\": \"600030603\"\r\n    },\r\n    {\r\n        \"parentHierarchyNodeId\": \"600004017\",\r\n        \"entitySequenceId\": \"600028963\"\r\n    }\r\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseHierarchyUrl}}/tollFreeNumberEntity/assign",
+					"host": [
+						"{{baseHierarchyUrl}}"
+					],
+					"path": [
+						"tollFreeNumberEntity",
+						"assign"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "assignTollfreeNumber seq id from other corp",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "[\r\n    {\r\n        \"parentHierarchyNodeId\": \"600004017\",\r\n        \"entitySequenceId\": \"600016159\"\r\n    },\r\n    {\r\n        \"parentHierarchyNodeId\": \"600004017\",\r\n        \"entitySequenceId\": \"600028963\"\r\n    }\r\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseHierarchyUrl}}/tollFreeNumberEntity/assign",
+					"host": [
+						"{{baseHierarchyUrl}}"
+					],
+					"path": [
+						"tollFreeNumberEntity",
+						"assign"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

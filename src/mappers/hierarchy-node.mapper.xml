@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="hierarchyNodeMapper">
+  
+      <insert id="addHierarchyChildNode">
+            INSERT INTO CERPT_HIERARCHY_NODES 
+            (
+                ID, HIR_ID, CORP_ID, NTP_ID,
+                NDE_ID, EFFECTIVE_DATE, CREATE_DATE, CREATE_NAME,
+                NDE_NAME, LAST_UPDATE_DATE, LAST_UPDATE_NAME, PARENT_HIERARCHY_ID
+            )
+            SELECT
+                #{id}, HIR_ID, CORP_ID, NTP_ID + 1,
+                #{ndeId}, SYSDATE, SYSDATE, #{loginUser},
+                q'[${name}]', SYSDATE, #{loginUser}, #{parentHierarchyNodeId}
+            FROM
+                CERPT_HIERARCHY_NODES
+            WHERE
+                id = #{parentHierarchyNodeId}
+    </insert>
+
+    <select id="getNextHierarchyNodeId">
+        SELECT CERPT_HIERARCHY_NODES_ID_SEQ.nextval AS SEQ_NUM FROM DUAL
+    </select>
+
+    <update id="updateRecordById"> 
+        UPDATE CERPT_HIERARCHY_NODES
+        <set>
+            <if test="nodeName and nodeName !=''"> 
+                NDE_NAME = q'[${nodeName}]',
+            </if>
+            LAST_UPDATE_NAME = #{loginUser},
+            LAST_UPDATE_DATE = SYSDATE
+        </set>
+        WHERE NDE_ID = #{nodeId}
+    </update>
+
+    <update id="addEndDate">
+    UPDATE CERPT_HIERARCHY_NODES
+    SET
+        END_DATE = SYSDATE,
+        LAST_UPDATE_NAME = #{loginUser},
+        LAST_UPDATE_DATE = SYSDATE 
+    WHERE ID = #{hierarchyNodeId}   
+    AND END_DATE is null
+    </update>
+
+    <delete id = "deleteRecord">      
+        DELETE FROM CERPT_HIERARCHY_NODES
+        WHERE NDE_ID = #{nodeId}
+    </delete>
+
+    <select id="findByParams">
+        SELECT 
+            TO_CHAR(chn.ID) AS ID,
+            chn.NTP_ID,
+            TO_CHAR(chn.CORP_ID) AS CORP_ID,
+            TO_CHAR(chn.PARENT_HIERARCHY_ID) AS PARENT_HIERARCHY_ID,
+            cn.NODE_TYPE
+        FROM
+            CERPT_HIERARCHY_NODES chn,
+            CERPT_NODES cn
+        WHERE
+            chn.END_DATE IS NULL
+            AND chn.NDE_ID = cn.id
+            <if test="hierarchyNodeId">
+                AND chn.ID = #{hierarchyNodeId}
+            </if>
+            <if test="nodeId">
+                AND chn.NDE_ID = #{nodeId}
+            </if>
+            <if test="nodeIdList"> 
+                <foreach collection="nodeIdList" index="index" item="item" open="and (" separator="or" close=")">
+                    chn.NDE_ID = #{item}
+                </foreach>
+            </if>
+            <if test="hierarchyNodeName AND corpId">
+                AND UPPER(chn.NAME) = UPPER(q'[${hierarchyNodeName}]')
+                AND chn.CORP_ID = #{corpId}
+            </if>
+            <if test="parentHierarchyNodeId"> 
+                AND chn.PARENT_HIERARCHY_ID = #{parentHierarchyNodeId}
+            </if>
+            <if test="parentHierarchyNodeIdList"> 
+                <foreach collection="parentHierarchyNodeIdList" index="index" item="item" open="and (" separator="or" close=")">
+                    chn.PARENT_HIERARCHY_ID = #{item}
+                </foreach>
+            </if>
+    </select>
+</mapper>

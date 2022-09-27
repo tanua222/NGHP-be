@@ -1,0 +1,63 @@
+{
+	"info": {
+		"_postman_id": "83591197-ecff-481e-925f-8d3ab65dd754",
+		"name": "IVS HAA Move WTN",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "moveWtn",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"wtnNodeId\": [\r\n        \"600005218\",\r\n        \"600004296\",\r\n    ],\r\n    \"targetParentHierarchyNodeId\": \"600004382\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseHierarchyUrl}}/workingTelephoneNumber/move",
+					"host": [
+						"{{baseHierarchyUrl}}"
+					],
+					"path": [
+						"workingTelephoneNumber",
+						"move"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "moveWtn same node",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"wtnNodeId\": [\r\n        \"600005218\",\r\n        \"600004296\",\r\n        \"600004366\"\r\n    ],\r\n    \"targetParentHierarchyNodeId\": \"600004382\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseHierarchyUrl}}/workingTelephoneNumber/move",
+					"host": [
+						"{{baseHierarchyUrl}}"
+					],
+					"path": [
+						"workingTelephoneNumber",
+						"move"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="haaAssignedUserReportMapper">
+  <select id="findByFilters">
+    SELECT
+        to_char(hn.id) as node_id,
+        hn.nde_name,
+        hn.ntp_id,
+        to_char(hnr.id) as assigned_report_id,
+        hnr.rpt_id,
+        n.node_type,
+        r.code,
+        hnr.lan_code,
+        lt.object_translated_value as name,
+        u.login_user_name,
+        to_char(hnr.usr_id) as usr_id,
+        hnr.dt_code,
+        hnr.fmt_code,
+        hnr.interactive_rpt,
+        hnr.predefined_rpt,
+        CASE 
+          WHEN n.end_date IS NOT NULL THEN 'N'
+          <!-- can session user action on this record? -->
+          ELSE (SELECT DECODE(COUNT(*), 0, 'N', 'Y')
+                  FROM haa_user_hierarchy_roles ee,
+                      (SELECT r.role_id
+                          FROM haa_role_privileges rp, haa_roles r, haa_privileges p
+                        WHERE rp.Role_Id =  r.Role_id AND rp.Privilege_Id =  p.Privilege_Id AND p.description = 'ASSIGN-REPORT') ff
+                WHERE ee.role_id = ff.role_id
+                  AND ee.user_id = ${loginUserId}
+                  AND (ee.hn_id = hn.id
+                      OR (ee.cascading = 'Y'
+                            AND ee.hn_id IN (
+                                  SELECT gg.id
+                                    FROM cerpt_hierarchy_nodes gg
+                                  WHERE gg.id != hn.id
+                                  START WITH gg.id = hn.id
+                                CONNECT BY gg.id = PRIOR parent_hierarchy_id
+                              ))))
+        END AS can_unassign_indicator 
+    FROM
+        cerpt_hierarchy_nodes hn,
+        CERPT_REPORTS r,
+        CERPT_HIERARCHY_NODE_REPORTS hnr,
+        cerpt_nodes n,
+        cerpt_users u,
+        cerpt_language_translations lt
+    WHERE
+        hnr.hnde_id = hn.id
+        and hnr.rpt_id = r.id
+        and n.id = hn.nde_id
+        and hnr.usr_id = u.id
+        and hnr.end_date is null
+        and hnr.predefined_rpt = 'Y'
+        and r.code = lt.object_id
+        and lt.lan_code = #{lan}
+        AND EXISTS (
+          <!-- show results visible to session user only -->
+          SELECT 1
+            FROM haa_user_hierarchy_roles ee,
+                (SELECT r.role_id
+                    FROM haa_role_privileges rp, haa_roles r, haa_privileges p
+                  WHERE rp.Role_Id =  r.Role_id AND rp.Privilege_Id =  p.Privilege_Id AND p.description = 'VIEW-NODE') ff
+          WHERE ee.role_id = ff.role_id
+            AND ee.user_id = ${loginUserId}
+            AND (ee.hn_id = hn.id
+                OR (ee.cascading = 'Y'
+                      AND ee.hn_id IN (
+                            SELECT gg.id
+                              FROM cerpt_hierarchy_nodes gg
+                            WHERE gg.id != hn.id
+                            START WITH gg.id = hn.id
+                          CONNECT BY gg.id = PRIOR parent_hierarchy_id
+                      )
+                    )
+                )
+              )
+        <choose>
+          <when test="corporationId and parentHnId">
+            and hn.corp_id = ${corporationId}
+            and hn.id = #{parentHnId}
+          </when>
+          <when test="corporationId">
+            and hn.corp_id = ${corporationId}
+          </when>
+          <when test="parentHnId">
+            and hn.id = #{parentHnId}
+          </when>
+          <when test="entities.length > 0">
+             <foreach collection="entities" item="item" open="and (" separator="or" close=")">
+       			    hnr.id = #{item.assignedReportId}
+  			      </foreach>
+          </when>
+          <otherwise>
+            and hn.corp_id = ${corporationId}
+          </otherwise>
+        </choose>
+        <if test="parentHierarchyNodeName">
+          and UPPER(hn.nde_name) like UPPER(q'[%${parentHierarchyNodeName}%]')
+        </if>
+        <if test="parentHierarchyNodeLevel != null">
+          and to_char(hn.ntp_id) = #{parentHierarchyNodeLevel}
+        </if>
+        <if test="reportLan">
+          and hnr.lan_code = q'[${reportLan}]'
+        </if>
+        <if test="reportCode">
+          and UPPER(r.code) like UPPER(q'[%${reportCode}%]')
+        </if>
+        <if test="reportDescription">
+          and UPPER(lt.object_translated_value) like UPPER(q'[%${reportDescription}%]')
+        </if>
+        <if test="recipientUserId">
+          and hnr.usr_id = ${recipientUserId}
+        </if>
+        <if test="formatCode">
+          and hnr.fmt_code = #{formatCode}
+        </if>
+        <if test="recipientLoginName">
+          and UPPER(u.login_user_name) like UPPER(q'[%${recipientLoginName}%]')
+        </if>
+  </select>
+
+  <select id="findByAssignedReportIdList">
+    SELECT
+        to_char(hnr.hnde_id) as node_id,
+        to_char(hnr.id) as assigned_report_id,
+        hnr.rpt_id,
+        hnr.lan_code,
+        to_char(hnr.usr_id) as usr_id,
+        hnr.dt_code,
+        hnr.fmt_code,
+        hnr.interactive_rpt,
+        hnr.predefined_rpt  
+    FROM
+        CERPT_HIERARCHY_NODE_REPORTS hnr
+    WHERE
+        hnr.end_date is null
+        <if test="assignedReportIdList">
+            <foreach collection="assignedReportIdList" item="item" open="and (" separator="or" close=")">
+              hnr.id = #{item}
+            </foreach>
+        </if>
+
+  </select>
+
+  <select id = "findByFiltersWithPagination">
+      WITH RECORDSET AS (
+         <include refid="findByFilters"/>
+      ), 
+      NUMBERED AS (
+         SELECT 
+         ROW_NUMBER() 
+         OVER (  
+            <foreach collection="sortConditions" index="index" item="item" open="ORDER BY " separator="," close="">
+       			${item}
+  			   </foreach>
+         ) RN, 
+         RECORDSET.*
+         FROM RECORDSET)
+      SELECT
+         CEIL((SELECT COUNT(*) FROM NUMBERED) / ${paginationParam.limit}) TOTAL_PAGES, 
+         (SELECT COUNT(*) FROM NUMBERED) TOTAL_ROWS,
+         NUMBERED.*
+      FROM NUMBERED
+      WHERE RN BETWEEN (${paginationParam.offset}+1) AND (${paginationParam.offset}+${paginationParam.limit})
+   </select>
+</mapper>

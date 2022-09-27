@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cerptUsersMapper">
+
+  <select id="findByFilters">
+    SELECT u.*
+      FROM cerpt_users u
+     WHERE UPPER(NVL(u.uuid_id, u.login_user_name)) = UPPER(#{loginUser})
+  </select>
+</mapper>

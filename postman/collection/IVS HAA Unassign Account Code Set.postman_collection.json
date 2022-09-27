@@ -1,0 +1,36 @@
+{
+	"info": {
+		"_postman_id": "71cc3a2c-7a6c-4b1a-94d4-16d7114ad5dd",
+		"name": "IVS HAA Unassign Account Code Set",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "unassignAccountCodeSet",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "[\r\n    {\r\n        \"entityNodeId\": \"600031820\"\r\n    },\r\n    {\r\n        \"entityNodeId\": \"600031819\"\r\n    }\r\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseHierarchyUrl}}/accountCodeSetEntity/unassign",
+					"host": [
+						"{{baseHierarchyUrl}}"
+					],
+					"path": [
+						"accountCodeSetEntity",
+						"unassign"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

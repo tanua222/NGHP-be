@@ -1,0 +1,87 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.name }}-deployment
+  namespace: {{ .Values.namespace }} 
+  labels:
+    app: {{ .Values.name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: {{ .Values.name }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/settings-cm.yml") . | sha256sum }}
+      labels:
+        app: {{ .Values.name }}
+    spec:
+      containers:
+      - name: {{ .Values.name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: 3006
+        env:
+        - name: NODE_ENV
+          value: {{ .Values.nodeEnv }}  
+        - name: NODE_EXTRA_CA_CERTS
+          value: {{ .Values.certificatePath }}          
+        - name: JWT_SESSION_SECRET
+          valueFrom:
+            secretKeyRef:
+                name: ivs-hierarchy-secret
+                key: JWT_SESSION_SECRET
+        - name: CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+                name: ivs-hierarchy-secret
+                key: CLIENT_ID 
+        - name: CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+                name: ivs-hierarchy-secret
+                key: CLIENT_SECRET  
+        - name: ORADB_CERPT_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+                name: ivs-hierarchy-secret
+                key: ORADB_CERPT_ADMIN_PASSWORD        
+        - name: ORADB_CERPT_REPORTING_PASSWORD
+          valueFrom:
+            secretKeyRef:
+                name: ivs-hierarchy-secret
+                key: ORADB_CERPT_REPORTING_PASSWORD
+        resources:
+          requests:
+            memory: {{ .Values.resources.requests.memory }}
+            cpu: {{ .Values.resources.requests.cpu }}
+          limits:
+            memory: {{ .Values.resources.limits.memory }}
+            cpu: {{ .Values.resources.limits.cpu }}                           
+        volumeMounts:
+        - name: application-config
+          mountPath: "/home/app/ivs/config"
+          readOnly: true
+        - name: cso-tcso-ca
+          mountPath: "/home/app/ivs/cert"
+          readOnly: true
+      volumes:
+        - name: application-config
+          configMap:
+            name: {{ .Values.name }}-configmap-{{ .Values.nodeEnv }}
+            items:
+            - key: {{ .Values.nodeEnv }}.yaml
+              path: {{ .Values.nodeEnv }}.yaml
+            - key: default.yaml
+              path: default.yaml
+        - name: cso-tcso-ca
+          secret:
+            secretName: cso-tcso-ca
+            items:
+              - key: cso-tcso-ca.pem
+                path: cso-tcso-ca.pem
+      imagePullSecrets:
+      - name: regcred            

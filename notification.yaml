@@ -1,0 +1,8 @@
+all:
+  - ferdinand.yanto@telus.com
+stage:
+input:
+error:
+  - ferdinand.yanto@telus.com
+production:
+

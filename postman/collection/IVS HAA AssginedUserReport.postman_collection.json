@@ -1,0 +1,107 @@
+{
+	"info": {
+		"_postman_id": "052de336-6a76-4beb-9cda-8f47792a2561",
+		"name": "IVS HAA AssginedUserReport",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "getAssignedUserReport",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept-Language",
+						"value": "en-CA",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseHierarchyUrl}}/userReport?corporationId=600002340&parentHierarchyNodeName=1.1",
+					"host": [
+						"{{baseHierarchyUrl}}"
+					],
+					"path": [
+						"userReport"
+					],
+					"query": [
+						{
+							"key": "corporationId",
+							"value": "600002340"
+						},
+						{
+							"key": "parentHierarchyNodeId",
+							"value": "600004017",
+							"disabled": true
+						},
+						{
+							"key": "parentHierarchyNodeName",
+							"value": "1.1"
+						},
+						{
+							"key": "parentHierarchyNodeLevel",
+							"value": "4",
+							"disabled": true
+						},
+						{
+							"key": "reportCode",
+							"value": "10",
+							"disabled": true
+						},
+						{
+							"key": "reportDescription",
+							"value": "calling",
+							"disabled": true
+						},
+						{
+							"key": "recipientLoginName",
+							"value": "gino",
+							"disabled": true
+						},
+						{
+							"key": "language",
+							"value": "F",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getAssignedUserReport pagination",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseHierarchyUrl}}/userReport?corporationId=600002340&limit=3&offset=0&sort=reportCode",
+					"host": [
+						"{{baseHierarchyUrl}}"
+					],
+					"path": [
+						"userReport"
+					],
+					"query": [
+						{
+							"key": "corporationId",
+							"value": "600002340"
+						},
+						{
+							"key": "limit",
+							"value": "3"
+						},
+						{
+							"key": "offset",
+							"value": "0"
+						},
+						{
+							"key": "sort",
+							"value": "reportCode"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

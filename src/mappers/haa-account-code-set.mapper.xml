@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="haaAccountCodeSetMapper">
+
+  <select id="findAssignedACSByFilters">
+    SELECT
+        to_char(a.entity_node_id)               entity_node_id,
+        to_char(a.hn_id)                        hn_id,
+        b.entity_seq_id,
+        b.entity_id,
+        c.ass_code                              ACCOUNTCODESET_CODE,
+        c.ass_desc                              ACCOUNTCODESET_DESC,
+        c.asn_length                            ACCOUNTCODESET_LENGTH,
+        to_char(a.effective_date, 'yyyy-mm-dd') effective_date,
+        ( d.ntp_id - 4 )                        nodelevel,
+        d.nde_name                              nodename,
+        e.node_type                             nodetype,
+        CASE 
+          WHEN a.end_date IS NOT NULL OR e.node_type = 'ROOT' THEN 'N'
+          <!-- can session user action on this record? -->
+          ELSE (SELECT DECODE(COUNT(*), 0, 'N', 'Y')
+                  FROM haa_user_hierarchy_roles ee,
+                      (SELECT r.role_id
+                          FROM haa_role_privileges rp, haa_roles r, haa_privileges p
+                        WHERE rp.Role_Id =  r.Role_id AND rp.Privilege_Id =  p.Privilege_Id AND p.description = 'ASSIGN-ACSET-ENTITY') ff
+                WHERE ee.role_id = ff.role_id
+                  AND ee.user_id = ${loginUserId}
+                  AND (ee.hn_id = d.id
+                      OR (ee.cascading = 'Y'
+                            AND ee.hn_id IN (
+                                  SELECT gg.id
+                                    FROM cerpt_hierarchy_nodes gg
+                                  WHERE gg.id != d.id
+                                  START WITH gg.id = d.id
+                                CONNECT BY gg.id = PRIOR parent_hierarchy_id
+                              ))))
+        END AS can_unassign_indicator
+    FROM
+        haa_node_entities     a,
+        haa_entities          b,
+        taccount_code_set     c,
+        cerpt_hierarchy_nodes d,
+        cerpt_nodes           e
+    WHERE
+            a.entity_seq_id = b.entity_seq_id
+        AND b.entity_id = to_char(c.asn_id)
+        AND a.hn_id = d.id
+        AND a.end_date is null
+        AND b.entity_type = 'ACSET'
+        AND e.id = d.nde_id
+        AND d.corp_id = ${corporationId}
+      <if test="accountCodeSetCode">
+        AND lower(c.ass_code) LIKE lower(q'[%${accountCodeSetCode}%]')
+      </if>
+      <if test="accountCodeSetName">
+        AND lower(c.ass_desc) LIKE lower(q'[%${accountCodeSetName}%]')
+      </if>
+      <if test="parentHierarchyNodeId">
+        AND a.hn_id = ${parentHierarchyNodeId}
+      </if>
+      <if test="parentHierarchyNodeName">
+        AND lower(d.nde_name) LIKE lower(q'[%${parentHierarchyNodeName}%]')
+      </if>
+      <if test="parentHierarchyNodeLevel != null">
+        AND ( d.ntp_id - 4 ) = ${parentHierarchyNodeLevel}
+      </if>
+        AND EXISTS (
+        SELECT 1
+        FROM haa_user_hierarchy_roles ee,
+            (SELECT r.role_id
+                FROM haa_role_privileges rp, haa_roles r, haa_privileges p
+                WHERE rp.Role_Id =  r.Role_id AND rp.Privilege_Id =  p.Privilege_Id AND p.description = 'VIEW-NODE') ff
+        WHERE ee.role_id = ff.role_id
+        AND ee.user_id = ${loginUserId}
+        AND (ee.hn_id = d.ID
+            OR (ee.cascading = 'Y'
+                    AND ee.hn_id IN (
+                        SELECT gg.id
+                            FROM cerpt_hierarchy_nodes gg
+                        WHERE gg.id != d.ID
+                        START WITH gg.id = d.ID
+                        CONNECT BY gg.id = PRIOR parent_hierarchy_id
+                    )
+                )
+            )
+        )
+  </select>
+
+  <select id = "findAssignedACSByFiltersWithPagination">
+      WITH RECORDSET AS (
+         <include refid="findAssignedACSByFilters"/>
+      ), 
+      NUMBERED AS (
+         SELECT 
+         ROW_NUMBER() 
+         OVER (  
+            <foreach collection="sortConditions" index="index" item="item" open="ORDER BY " separator="," close="">
+       			${item}
+  			   </foreach>
+         ) RN, 
+         RECORDSET.*
+         FROM RECORDSET)
+      SELECT
+         CEIL((SELECT COUNT(*) FROM NUMBERED) / ${paginationParam.limit}) TOTAL_PAGES, 
+         (SELECT COUNT(*) FROM NUMBERED) TOTAL_ROWS,
+         NUMBERED.*
+      FROM NUMBERED
+      WHERE RN BETWEEN (${paginationParam.offset}+1) AND (${paginationParam.offset}+${paginationParam.limit})
+   </select>
+
+
+  <select id="findAssignableACSByFilters">
+    SELECT
+        a.ass_code                             ACCOUNTCODESET_CODE,
+        a.ass_desc                             ACCOUNTCODESET_DESC, 
+        a.asn_length                           ACCOUNTCODESET_LENGTH,
+        to_char(c.create_date, 'yyyy-mm-dd')   effective_date,
+        to_char(c.end_date, 'yyyy-mm-dd')      end_date, 
+        c.entity_seq_id
+    FROM
+        taccount_code_set     a,
+        cerpt_hierarchy_nodes b,
+        haa_entities          c
+    WHERE
+            b.id = ${hnId}
+        AND a.con_id = b.corp_id
+        AND to_char(a.asn_id) = c.entity_id
+        AND c.corp_id = a.con_id
+        AND c.entity_type = 'ACSET'
+      <if test="accountCodeSetCode">
+        AND lower(a.ass_code) LIKE lower('%${accountCodeSetCode}%')
+      </if>
+      <if test="accountCodeSetDescription">
+        AND lower(a.ass_desc) LIKE lower('%${accountCodeSetDescription}%')
+      </if>
+        AND to_char(a.asn_id) NOT IN (
+            SELECT
+                asn_id
+            FROM
+                taccount_code_set a1, haa_node_entities b1, haa_entities      c1
+            WHERE
+                    b1.hn_id = ${hnId}
+                AND b1.entity_seq_id = c1.entity_seq_id
+                AND a1.asn_id = c1.entity_id
+                AND c1.entity_type = 'ACSET'
+                and b1.end_date is null
+        )
+  </select>
+
+  <select id = "findAssignableACSByFiltersWithPagination">
+      WITH RECORDSET AS (
+         <include refid="findAssignableACSByFilters"/>
+      ), 
+      NUMBERED AS (
+         SELECT 
+         ROW_NUMBER() 
+         OVER (  
+            <foreach collection="sortConditions" index="index" item="item" open="ORDER BY " separator="," close="">
+       			${item}
+  			   </foreach>
+         ) RN, 
+         RECORDSET.*
+         FROM RECORDSET)
+      SELECT
+         CEIL((SELECT COUNT(*) FROM NUMBERED) / ${paginationParam.limit}) TOTAL_PAGES, 
+         (SELECT COUNT(*) FROM NUMBERED) TOTAL_ROWS,
+         NUMBERED.*
+      FROM NUMBERED
+      WHERE RN BETWEEN (${paginationParam.offset}+1) AND (${paginationParam.offset}+${paginationParam.limit})
+   </select>
+
+</mapper>

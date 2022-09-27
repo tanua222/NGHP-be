@@ -1,0 +1,618 @@
+{
+	"info": {
+		"_postman_id": "4159b7c8-9575-4bb4-9002-8b6703c879df",
+		"name": "IVS HAA User Role Mgt",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Search Assigned Users",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "tokenName",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "scope",
+							"value": "{{scope}}",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "{{clientSecret}}",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "{{clientId}}",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "{{accessTokenUrl}}",
+							"type": "string"
+						},
+						{
+							"key": "authUrl",
+							"value": "{{authUrl}}",
+							"type": "string"
+						},
+						{
+							"key": "redirect_uri",
+							"value": "{{callbackUrl}}",
+							"type": "string"
+						},
+						{
+							"key": "tokenType",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/user?uuid=master&parentHierarchyNodeId=600004082&offset=0&limit=4&sort=userLogin",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"user"
+					],
+					"query": [
+						{
+							"key": "uuid",
+							"value": "master"
+						},
+						{
+							"key": "corporationId",
+							"value": "600002921",
+							"disabled": true
+						},
+						{
+							"key": "userFirstName",
+							"value": "Ferdie",
+							"disabled": true
+						},
+						{
+							"key": "userLastName",
+							"value": "yanto1",
+							"disabled": true
+						},
+						{
+							"key": "userLogin",
+							"value": "fyanto",
+							"disabled": true
+						},
+						{
+							"key": "parentHierarchyNodeId",
+							"value": "600004082"
+						},
+						{
+							"key": "parentHierarchyNodeName",
+							"value": "node ",
+							"disabled": true
+						},
+						{
+							"key": "parentHierarchyNodeLevel",
+							"value": "2",
+							"disabled": true
+						},
+						{
+							"key": "offset",
+							"value": "0"
+						},
+						{
+							"key": "limit",
+							"value": "4"
+						},
+						{
+							"key": "sort",
+							"value": "userLogin"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get User Assignable Roles",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "tokenName",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "scope",
+							"value": "{{scope}}",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "{{clientSecret}}",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "{{clientId}}",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "{{accessTokenUrl}}",
+							"type": "string"
+						},
+						{
+							"key": "authUrl",
+							"value": "{{authUrl}}",
+							"type": "string"
+						},
+						{
+							"key": "redirect_uri",
+							"value": "{{callbackUrl}}",
+							"type": "string"
+						},
+						{
+							"key": "tokenType",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/user/assignableRole?uuid=fyanto1&parentHierarchyNodeId=600004536",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"user",
+						"assignableRoles"
+					],
+					"query": [
+						{
+							"key": "uuid",
+							"value": "fyanto1"
+						},
+						{
+							"key": "parentHierarchyNodeId",
+							"value": "600004536",
+							"description": "required"
+						},
+						{
+							"key": "userId",
+							"value": "600002664",
+							"description": "optional",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Assignable Users",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "tokenName",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "scope",
+							"value": "{{scope}}",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "{{clientSecret}}",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "{{clientId}}",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "{{accessTokenUrl}}",
+							"type": "string"
+						},
+						{
+							"key": "authUrl",
+							"value": "{{authUrl}}",
+							"type": "string"
+						},
+						{
+							"key": "redirect_uri",
+							"value": "{{callbackUrl}}",
+							"type": "string"
+						},
+						{
+							"key": "tokenType",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/user/assignable?uuid=x178436&parentHierarchyNodeId=600003687",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"user",
+						"assignable"
+					],
+					"query": [
+						{
+							"key": "uuid",
+							"value": "x178436"
+						},
+						{
+							"key": "parentHierarchyNodeId",
+							"value": "600003687"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Assigned User Detail",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "tokenName",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "scope",
+							"value": "{{scope}}",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "{{clientSecret}}",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "{{clientId}}",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "{{accessTokenUrl}}",
+							"type": "string"
+						},
+						{
+							"key": "authUrl",
+							"value": "{{authUrl}}",
+							"type": "string"
+						},
+						{
+							"key": "redirect_uri",
+							"value": "{{callbackUrl}}",
+							"type": "string"
+						},
+						{
+							"key": "tokenType",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/user/detail?userId=600002664&hierarchyNodeId=600004082",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"user",
+						"detail"
+					],
+					"query": [
+						{
+							"key": "userId",
+							"value": "600002664"
+						},
+						{
+							"key": "hierarchyNodeId",
+							"value": "600004082"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Assign User to Node",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "tokenName",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "scope",
+							"value": "{{scope}}",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "{{clientSecret}}",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "{{clientId}}",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "{{accessTokenUrl}}",
+							"type": "string"
+						},
+						{
+							"key": "authUrl",
+							"value": "{{authUrl}}",
+							"type": "string"
+						},
+						{
+							"key": "redirect_uri",
+							"value": "{{callbackUrl}}",
+							"type": "string"
+						},
+						{
+							"key": "tokenType",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"userId\": \"600002664\",\r\n    \"parentHierarchyNodeId\": \"600004082\",\r\n    \"role\": [\r\n        {\r\n            \"roleId\": \"5\",\r\n            \"cascadeInd\": \"Y\"\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/user/assign?uuid=x178436",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"user",
+						"assign"
+					],
+					"query": [
+						{
+							"key": "uuid",
+							"value": "x178436"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Unassign Users from Node",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "tokenName",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "scope",
+							"value": "{{scope}}",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "{{clientSecret}}",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "{{clientId}}",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "{{accessTokenUrl}}",
+							"type": "string"
+						},
+						{
+							"key": "authUrl",
+							"value": "{{authUrl}}",
+							"type": "string"
+						},
+						{
+							"key": "redirect_uri",
+							"value": "{{callbackUrl}}",
+							"type": "string"
+						},
+						{
+							"key": "tokenType",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "[\r\n    {\r\n        \"userId\": \"600002664\",\r\n        \"parentHierarchyNodeId\": \"600004082\"\r\n    },\r\n    {\r\n        \"userId\": \"600002665\",\r\n        \"parentHierarchyNodeId\": \"600004082\"\r\n    }\r\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/user/unassign?uuid=x178436",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"user",
+						"unassign"
+					],
+					"query": [
+						{
+							"key": "uuid",
+							"value": "x178436"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update User in Node",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "tokenName",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "scope",
+							"value": "{{scope}}",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "{{clientSecret}}",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "{{clientId}}",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "{{accessTokenUrl}}",
+							"type": "string"
+						},
+						{
+							"key": "authUrl",
+							"value": "{{authUrl}}",
+							"type": "string"
+						},
+						{
+							"key": "redirect_uri",
+							"value": "{{callbackUrl}}",
+							"type": "string"
+						},
+						{
+							"key": "tokenType",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"userId\": \"600002664\",\r\n    \"parentHierarchyNodeId\": \"600004082\",\r\n    \"role\": [\r\n        {\r\n            \"roleId\": \"5\",\r\n            \"cascadeInd\": \"Y\"\r\n        },\r\n        {\r\n            \"roleId\": \"1001221\",\r\n            \"cascadeInd\": \"Y\"\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/user/update?uuid=x178436",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"user",
+						"update"
+					],
+					"query": [
+						{
+							"key": "uuid",
+							"value": "x178436"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

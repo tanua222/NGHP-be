@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="hierarchyNodeListMapper">
+
+    <select id ="findByFilters">
+        SELECT
+            TO_CHAR(cn.ID) AS NDE_ID,
+            chn.NTP_ID,
+            cn.NAME,
+            chn.EFFECTIVE_DATE,
+            cn.DESCRIPTION1,
+            cn.NODE_TYPE,
+            TO_CHAR(chn.PARENT_HIERARCHY_ID) AS PARENT_HIERARCHY_ID,
+            (b.NDE_NAME) AS PARENT_NODE_NAME,
+            (b.NTP_ID) AS PARENT_NODE_LEVEL,
+            (c.NODE_TYPE) AS PARENT_NODE_TYPE,
+            CASE 
+              WHEN chn.end_date IS NOT NULL THEN 'N'
+              WHEN cn.NODE_TYPE IN ('DWTN', 'ROOT') THEN 'N'
+              ELSE (SELECT DECODE(COUNT(*), 0, 'N', 'Y')
+                      FROM haa_user_hierarchy_roles ee,
+                          (SELECT r.role_id
+                             FROM haa_role_privileges rp, haa_roles r, haa_privileges p
+                            WHERE rp.Role_Id =  r.Role_id AND rp.Privilege_Id =  p.Privilege_Id AND p.description IN ('MOVE-NODE')) ff
+                    WHERE ee.role_id = ff.role_id
+                      AND ee.user_id = ${loginUserId}
+                      AND (ee.hn_id = chn.ID
+                          OR (ee.cascading = 'Y'
+                                AND ee.hn_id IN (
+                                      SELECT gg.id
+                                        FROM cerpt_hierarchy_nodes gg
+                                      WHERE gg.id != chn.ID
+                                      START WITH gg.id = chn.ID
+                                    CONNECT BY gg.id = PRIOR parent_hierarchy_id
+                                  ))))
+            END AS CAN_MOVE_INDICATOR,
+            CASE 
+              WHEN chn.end_date IS NOT NULL THEN 'N'
+              WHEN cn.NODE_TYPE IN ('DWTN', 'ROOT') THEN 'N'
+              ELSE (SELECT DECODE(COUNT(*), 0, 'N', 'Y')
+                      FROM haa_user_hierarchy_roles ee,
+                          (SELECT r.role_id
+                             FROM haa_role_privileges rp, haa_roles r, haa_privileges p
+                            WHERE rp.Role_Id =  r.Role_id AND rp.Privilege_Id =  p.Privilege_Id AND p.description IN ('VIEW-NODE')) ff
+                    WHERE ee.role_id = ff.role_id
+                      AND ee.user_id = ${loginUserId}
+                       AND (ee.hn_id = chn.ID
+                          OR (ee.cascading = 'Y'
+                                AND ee.hn_id IN (
+                                      SELECT gg.id
+                                        FROM cerpt_hierarchy_nodes gg
+                                      WHERE gg.id != chn.ID
+                                      START WITH gg.id = chn.ID
+                                    CONNECT BY gg.id = PRIOR parent_hierarchy_id
+                                  ))))
+            END AS CAN_VIEW_INDICATOR
+        FROM
+            CERPT_NODES cn
+        LEFT JOIN CERPT_HIERARCHY_NODES chn ON 
+            chn.nde_id = cn.id
+        LEFT JOIN CERPT_HIERARCHY_NODES b ON
+            chn.PARENT_HIERARCHY_ID = b.ID
+        LEFT JOIN CERPT_NODES c ON
+            b.NDE_ID = c.ID
+        WHERE
+            cn.NODE_TYPE != 'WTN'
+            <choose>
+                <when test="corporationId AND parentHierarchyNodeId">
+                    AND chn.PARENT_HIERARCHY_ID = #{parentHierarchyNodeId}
+                    AND chn.CORP_ID = #{corporationId}
+                </when>
+                <when test="parentHierarchyNodeId">
+                    AND chn.PARENT_HIERARCHY_ID = #{parentHierarchyNodeId}
+                </when>
+                <otherwise>
+                    AND chn.CORP_ID = #{corporationId}
+                </otherwise>
+            </choose>
+            <if test="hierarchyNodeName != undefined and hierarchyNodeName != '' and hierarchyNodeName != null">
+                <bind name="hierarchyNodeName" value="'%' + hierarchyNodeName + '%'" />
+                AND LOWER(cn.NAME) LIKE CONCAT('%', CONCAT(LOWER(q'[${hierarchyNodeName}]'), '%'))
+            </if>
+            <if test="hierarchyNodeLevel != undefined">
+                AND chn.NTP_ID = ${hierarchyNodeLevel} + 4
+            </if>
+            AND chn.END_DATE IS NULL
+            AND EXISTS (
+                SELECT 1
+                FROM haa_user_hierarchy_roles ee,
+                    (SELECT r.role_id
+                        FROM haa_role_privileges rp, haa_roles r, haa_privileges p
+                        WHERE rp.Role_Id =  r.Role_id AND rp.Privilege_Id =  p.Privilege_Id AND p.description IN ('VIEW-NODE')) ff
+                WHERE ee.role_id = ff.role_id
+                AND ee.user_id = ${loginUserId}
+                AND (ee.hn_id = chn.ID
+                    OR ee.hn_id = chn.PARENT_HIERARCHY_ID
+                    OR (ee.cascading = 'Y'
+                            AND ee.hn_id IN (
+                                SELECT gg.id
+                                    FROM cerpt_hierarchy_nodes gg
+                                WHERE gg.id != chn.ID
+                                START WITH gg.id = chn.ID
+                                CONNECT BY gg.id = PRIOR parent_hierarchy_id
+                            )
+                        )
+                    )
+                )
+
+    </select>
+
+
+    <select id = "findByFiltersWithPagination">      
+      WITH RECORDSET AS (
+         <include refid="findByFilters"/>
+      ), 
+      NUMBERED AS (
+         SELECT 
+         ROW_NUMBER() 
+         OVER (  
+            <foreach collection="sortConditions" index="index" item="item" open="ORDER BY " separator="," close="">
+       			${item}
+            </foreach>
+         ) RN, 
+         RECORDSET.*
+         FROM RECORDSET)
+      SELECT
+         CEIL((SELECT COUNT(*) FROM NUMBERED) / ${paginationParam.limit}) TOTAL_PAGES, 
+         (SELECT COUNT(*) FROM NUMBERED) TOTAL_ROWS,
+         NUMBERED.*
+      FROM NUMBERED
+      WHERE RN BETWEEN (${paginationParam.offset}+1) AND (${paginationParam.offset}+${paginationParam.limit})
+   </select>
+  
+</mapper>

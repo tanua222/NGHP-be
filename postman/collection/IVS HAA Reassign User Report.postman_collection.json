@@ -1,0 +1,117 @@
+{
+	"info": {
+		"_postman_id": "9b70cb9f-75dd-40d8-8b41-f251513d3e15",
+		"name": "IVS HAA Reassign User Report",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "reassignUserReport user already existing",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"assignedReportId\": [\r\n        \"600002537\",\r\n        \"600002620\"\r\n    ],\r\n    \"recipientUserId\": \"600002744\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseHierarchyUrl}}/userReport/reassign",
+					"host": [
+						"{{baseHierarchyUrl}}"
+					],
+					"path": [
+						"userReport",
+						"reassign"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "reassignUserReport already assigned",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"assignedReportId\": [\r\n        \"600002619\",\r\n        \"600002620\"\r\n    ],\r\n    \"recipientUserId\": \"600002744\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseHierarchyUrl}}/userReport/reassign",
+					"host": [
+						"{{baseHierarchyUrl}}"
+					],
+					"path": [
+						"userReport",
+						"reassign"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "reassignUserReport not found",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"assignedReportId\": [\r\n        \"600002575\",\r\n        \"600002495\"\r\n    ],\r\n    \"recipientUserId\": \"600002004\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseHierarchyUrl}}/userReport/reassign",
+					"host": [
+						"{{baseHierarchyUrl}}"
+					],
+					"path": [
+						"userReport",
+						"reassign"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "reassignUserReport",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"assignedReportId\": [\r\n        \"600002619\",\r\n        \"600002620\"\r\n    ],\r\n    \"recipientUserId\": \"600002004\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseHierarchyUrl}}/userReport/reassign",
+					"host": [
+						"{{baseHierarchyUrl}}"
+					],
+					"path": [
+						"userReport",
+						"reassign"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
