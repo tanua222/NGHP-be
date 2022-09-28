@@ -4,11 +4,9 @@
 
   <select id="homePageStatistics">
 SELECT
-    RN, 
     RESULT_COUNT, 
     CLEC_FILENAME, 
     EDI_FILENAME,
-    DT_DOWNLOADED,
     DT_DOWNLOADED_PST_FMT,
     NAME,
     CLEC_PROV,
@@ -25,7 +23,7 @@ FROM
   ( SELECT
     row_number() over
 (
-ORDER BY clec_filename desc
+ORDER BY ${sortConditions}
       ) rn, 
       COUNT(*) OVER () as result_count, 
       x.* 
@@ -40,7 +38,7 @@ ORDER BY clec_filename desc
                             blif_file.clec_filename,
                             blif_file.edi_filename,
                             blif_file.dt_downloaded,
-                            to_char(from_tz(CAST(blif_file.dt_downloaded AS TIMESTAMP), dbtimezone) AT TIME ZONE to_char('PST'),
+                            to_char(from_tz(CAST(blif_file.dt_downloaded AS TIMESTAMP), dbtimezone) AT TIME ZONE to_char('${webTZ}'),
                                     'yyyy-mm-dd HH24:MI:SS')                                     AS dt_downloaded_pst_fmt,
                             blif_spid.name,
                             blif_file.clec_prov,
@@ -67,7 +65,7 @@ ORDER BY clec_filename desc
 JOIN blif_spid ON blif_file.clec_spid = blif_spid.spid
 WHERE
         file_status = '1'
-    AND telus_ind = 'N'
+    AND telus_ind = '${telusInd}'
 GROUP BY
     clec_filename,
     edi_filename,
@@ -77,7 +75,7 @@ GROUP BY
                     ) y
 WHERE
     ( y.new + y.awaiting_precheck + y.awaiting_blif_to_direction + y.locked_by_automation + y.failed_blif_to_direction + y.awaiting_ack_accepted +
-    y.awaiting_ack_rejected ) >= 0
+    y.awaiting_ack_rejected ) > 0
             ) x )
 WHERE
     RN BETWEEN (${paginationParam.offset}+1) AND (${paginationParam.offset}+${paginationParam.limit})

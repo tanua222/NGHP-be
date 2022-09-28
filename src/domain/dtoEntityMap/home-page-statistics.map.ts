@@ -24,21 +24,19 @@ export class HomePageStatisticsMap {
     static entityToDto(entities: HomePageStatisticsEntity[]): HomePageStatisticsDto[] {
         const dtos = entities.map((entity) => {
             const dto = new HomePageStatisticsDto();
-            dto.rn = entity.rn;
-            dto.resultCount = entity.resultCount;
+            dto.totalFilteredRows = entity.resultCount;
             dto.clecFilename = entity.clecFilename;
             dto.ediFilename = entity.ediFilename;
-            dto.dtDownloaded = entity.dtDownloaded;
-            dto.dtDownloadedPstFmt = entity.dtDownloadedPstFmt;
-            dto.name = entity.name;
-            dto.clecProv = entity.clecProv;
-            dto.new = entity.new;
+            dto.dateDownloadedFormattted = entity.dtDownloadedPstFmt;
+            dto.clec = entity.name;
+            dto.province = entity.clecProv;
+            dto.newFile = entity.new;
             dto.awaitingPrecheck = entity.awaitingPrecheck;
             dto.awaitingBlifToDirection = entity.awaitingBlifToDirection;
             dto.lockedByAutomation = entity.lockedByAutomation;
             dto.failedBlifToDirection = entity.failedBlifToDirection;
-            dto.awaitingAckAccepted = entity.awaitingAckAccepted;
-            dto.awaitingAckRejected = entity.awaitingAckRejected;
+            dto.awaitingAcknowledgementAccepted = entity.awaitingAckAccepted;
+            dto.awaitingAcknowledgementRejected = entity.awaitingAckRejected;
             dto.totalReceived = entity.totalReceived;
             dto.totalProcessed = entity.totalProcessed;
             return dto;

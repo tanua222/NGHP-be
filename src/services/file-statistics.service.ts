@@ -1,10 +1,12 @@
 import HomePageStatisticsDao from '../dao/home-page-statistics.dao';
 import { RequestParam, SortParam } from '../domain/dto/haa-common.dto';
 import { HomePageStatisticsMap } from '../domain/dtoEntityMap/home-page-statistics.map';
-import HaaQueryParams from '../domain/entities/haa-query-param.entity';
+import HaaQueryParams, { HomePageStatisticsQueryParam } from '../domain/entities/haa-query-param.entity';
 import HomePageStatisticsEntity from '../domain/entities/home-page-statistics.entity';
 import Context from '../utils/context';
 import HaaBaseGetService from './haa-base-get.service';
+import { HomePageStatisticsRequestParam } from '../domain/dto/haa-common.dto';
+
 
 export default class FileStatisticsService extends HaaBaseGetService<HomePageStatisticsDao> {
   constructor(context: Context) {
@@ -27,19 +29,13 @@ export default class FileStatisticsService extends HaaBaseGetService<HomePageSta
     return HomePageStatisticsMap.mapDtoToEntitySortParams(sortParams);
   }
 
+  mapToEntityQueryParams(requestParam: HomePageStatisticsRequestParam): HaaQueryParams {
+    const haaEntityQueryParams: HomePageStatisticsQueryParam = super.mapToEntityQueryParams(requestParam);
 
-  // version 2
+    haaEntityQueryParams.telusInd = requestParam.telusInd;
+    haaEntityQueryParams.webTZ = requestParam.webTZ;
 
-  // async getHomePageStatistics(): Promise<any> {
-  //   try {
-  //     const result = await this.dao.statistics();
-  //     return {
-  //       status: "success",
-  //       data: result
-  //     };
-  //   } catch (error) {
-  //     this.log.error(error);
-  //     return ResponseDto.internalError();
-  //   }
-  // }
+    return haaEntityQueryParams;
+  }
+
 }

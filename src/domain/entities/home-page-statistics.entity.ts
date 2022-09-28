@@ -3,11 +3,9 @@ import BaseEntity from './base.entity';
 const transformer = require('json-transformer-node');
 
 export default class HomePageStatisticsEntity extends BaseEntity {
-  rn: string;
   resultCount: string;
   clecFilename: string;
   ediFilename: string;
-  dtDownloaded: string;
   dtDownloadedPstFmt: string;
   name: string;
   clecProv: string;
@@ -25,11 +23,9 @@ export default class HomePageStatisticsEntity extends BaseEntity {
   static transformer = {
     mapping: {
       item: {
-        rn: 'RN',
         resultCount: 'RESULT_COUNT',
         clecFilename: 'CLEC_FILENAME',
         ediFilename: 'EDI_FILENAME',
-        dtDownloaded: 'DT_DOWNLOADED',
         dtDownloadedPstFmt: 'DT_DOWNLOADED_PST_FMT',
         name: 'NAME',
         clecProv: 'CLEC_PROV',
@@ -64,5 +60,10 @@ export default class HomePageStatisticsEntity extends BaseEntity {
       return transformer.transform({ data: json }, HomePageStatisticsEntity.transformerArray).result;
     }
     throw ResponseDto.internalError('Array is expected');
+  }
+
+  static getDbColumnName(columnName: string): any {
+    const index = Object.keys(HomePageStatisticsEntity.transformer.mapping.item).findIndex((n1) => n1 == columnName);
+    return index > -1 ? Object.values(HomePageStatisticsEntity.transformer.mapping.item)[index] : undefined;
   }
 }

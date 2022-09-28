@@ -11,6 +11,7 @@ import {
   RequestParam,
   SortParam,
   UserReportDetailRequestParam,
+  HomePageStatisticsRequestParam
 } from '../../domain/dto/haa-common.dto';
 import { AppConfig } from '../../utils/app-config';
 import { COMMA_SEPARATOR, ENTITY_TYPE, GUI_SORT_DESC_OPERATOR, Language } from '../../utils/constants';
@@ -161,8 +162,8 @@ export const mapPaginatingListReqToRequestParam = (req: Request, res: Response) 
   context.log.debug('mapPaginatingListReqToRequestParam triggered');
   const requestParam: any = mapCommonGetReqToRequestParam(req, res, new RequestParam());
   // required override in case client didn't pass pagination params
-  requestParam.paginationParam.ignoreServicePagination = false; 
-  requestParam.paginationParam.paginationRequired = true; 
+  requestParam.paginationParam.ignoreServicePagination = false;
+  requestParam.paginationParam.paginationRequired = true;
 
   Object.assign(requestParam, req.query);
 
@@ -229,14 +230,14 @@ export const mapEntityPostReqToRequestParam = (entityType: ENTITY_TYPE) => {
   };
 };
 
-export const mapHaaExtractCreateReqToRequestParam = (req: Request,res:Response)=>{
+export const mapHaaExtractCreateReqToRequestParam = (req: Request, res: Response) => {
   const context = res.locals.context;
   context.log.debug('mapHaaExtractCreateReqToRequestParam triggered');
 
   const queryParam: any = req.query;
 
   let requestParam = new HaaExtractCreateRequestParam()
-  requestParam.hierarchyNodeId = queryParam?.hierarchyNodeId 
+  requestParam.hierarchyNodeId = queryParam?.hierarchyNodeId
   requestParam.language = getLanguageCode(req.headers['accept-language']!)
   context.log.debug('mapCommonFeatureReqToRequestParam success with requestParam', requestParam);
   return requestParam;
@@ -313,6 +314,22 @@ export const mapUpdateUserReportReqToRequestParam = (
   const { assignedReportId }: any = req.params;
 
   requestParam.assignedReportId = assignedReportId;
+
+  return requestParam;
+};
+
+export const mapFileStatisticsGetReqToRequestParam = (req: Request, res: Response): HomePageStatisticsRequestParam => {
+  const context = res.locals.context;
+  context.log.debug('mapFileStatisticsGetReqToRequestParam triggered');
+  let requestParam = mapCommonGetReqToRequestParam(req, res, new HomePageStatisticsRequestParam());
+  requestParam = mapCommonFeatureReqToRequestParam(req, res, requestParam);
+
+  context.log.debug('mapFileStatisticsGetReqToRequestParam success with requestParam', requestParam);
+
+  const { telusInd, webTZ }: any = req.query;
+
+  requestParam.telusInd = telusInd;
+  requestParam.webTZ = webTZ;
 
   return requestParam;
 };

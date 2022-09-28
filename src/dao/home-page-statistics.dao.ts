@@ -1,7 +1,8 @@
-import oracledb from 'oracledb';
+import { SortParam } from '../domain/dto/haa-common.dto';
+import HomePageStatisticsEntity from '../domain/entities/home-page-statistics.entity';
 import { BaseDaoOptions } from './base.dao';
 import HaaBaseDao from './haa-base.dao';
-import HomePageStatisticsEntity from '../domain/entities/home-page-statistics.entity';
+
 
 export default class HomePageStatisticsDao extends HaaBaseDao {
   constructor(options: BaseDaoOptions) {
@@ -11,21 +12,16 @@ export default class HomePageStatisticsDao extends HaaBaseDao {
     });
   }
 
-  // async executeWithQueryName(query = 'homePageStatistics') {
-  //   this.log.debug('HomePageStatisticsDao.executeWithQueryName : queryName :' + query);
-  //   let result = await this.execute(query, { options: { outFormat: oracledb.OUT_FORMAT_OBJECT } });
-  //   const dbResults = result?.rows || [];
-
-  //   const entities = dbResults?.length > 0 ? this.mapDbResultToEntity(dbResults) : undefined;
-  //   return entities;
-  // }
-
-  // async statistics() {
-  //   this.log.debug('select home page statistics');
-  //   return await this.executeWithQueryName('homePageStatistics');
-  // }
-
   mapDbResultToEntity(results: any): HomePageStatisticsEntity[] {
     return HomePageStatisticsEntity.transform(results);
+  }
+
+  mapEntityParamsToDbColumns(sortParams: SortParam[]): string[] {
+    const sortConditions = sortParams
+      ?.filter((s1: any) => HomePageStatisticsEntity.getDbColumnName(s1.fieldName))
+      .map((s1: any) => {
+        return { ...s1, fieldName: HomePageStatisticsEntity.getDbColumnName(s1.fieldName) };
+      });
+    return sortConditions;
   }
 }

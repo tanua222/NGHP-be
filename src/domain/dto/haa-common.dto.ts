@@ -126,6 +126,11 @@ export class UserReportDetailRequestParam extends RequestParam {
   assignedReportId?: string;
 }
 
+export class HomePageStatisticsRequestParam extends RequestParam {
+  telusInd?: string;
+  webTZ?: string;
+}
+
 export class UserReportAssignInputRequestParam {
   parentHierarchyNodeId: string;
   reportId: number[];

@@ -75,3 +75,4 @@ output/coverage/integration/integrationtest.xml
 chart/ivs-hierarchy/config
 /.vs
 /cert
+.history/*

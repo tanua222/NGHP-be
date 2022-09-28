@@ -124,3 +124,8 @@ export class HaaCreateExtractsQueryParams extends HaaQueryParams {
   extractFile?:any;
   message?:string;
 }
+
+export class HomePageStatisticsQueryParam extends HaaQueryParams {
+  telusInd?: string;
+  webTZ?: string;
+}

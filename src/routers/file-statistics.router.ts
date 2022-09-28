@@ -3,14 +3,15 @@ import HaaBaseDao from '../dao/haa-base.dao';
 import { RequestParam } from '../domain/dto/haa-common.dto';
 import ResponseDto from '../domain/dto/response.dto';
 import {
-  mapFeatureGetReqToRequestParam
+  mapFeatureGetReqToRequestParam,
+  mapFileStatisticsGetReqToRequestParam
 } from '../middleware/haa/haa-req-mapper';
-import FileStatisticskService from '../services/file-statistics.service';
+import FileStatisticsService from '../services/file-statistics.service';
 import HaaBaseGetService from '../services/haa-base-get.service';
 
 const router: express.Router = express.Router();
 
-router.get('/', execute(FileStatisticskService));
+router.get('/', execute(FileStatisticsService, mapFileStatisticsGetReqToRequestParam));
 
 function execute<T extends HaaBaseGetService<HaaBaseDao>>(
   ServiceClass: new (...args: any[]) => T,
