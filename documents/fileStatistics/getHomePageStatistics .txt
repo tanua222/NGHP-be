@@ -1,0 +1,103 @@
+SELECT
+    *
+FROM 
+  ( SELECT
+    row_number() over
+(
+ORDER BY ${datatableInParams.sortCol} ${datatableInParams.sortDir}
+      ) rn, 
+      COUNT(*) OVER () as result_count, 
+      x.* 
+    FROM 
+      (
+        SELECT 
+          y.*, 
+          (
+            y.AWAITING_ACK_ACCEPTED + y.AWAITING_ACK_REJECTED
+          ) AS TOTAL_PROCESSED 
+        FROM 
+          (
+            SELECT 
+              BLIF_FILE.CLEC_FILENAME, 
+              BLIF_FILE.EDI_FILENAME, 
+              BLIF_FILE.DT_DOWNLOADED, 
+              TO_CHAR(
+                FROM_TZ(
+                  CAST(
+                    BLIF_FILE.DT_DOWNLOADED AS TIMESTAMP
+                  ), 
+                  DBTIMEZONE
+                ) AT TIME ZONE TO_CHAR(
+                  #{webTZ,jdbcType=VARCHAR}), 'yyyy-mm-dd HH24:MI:SS') AS DT_DOWNLOADED_PST_FMT,
+                  BLIF_SPID.NAME, 
+                  BLIF_FILE.CLEC_PROV, 
+                  SUM (
+                    DECODE(
+                      BLIF_LISTINGS.INTERNAL_STATUS, '0000', 
+                      1, 0
+                    )
+                  ) AS NEW, 
+                  SUM (
+                    CASE BLIF_LISTINGS.INTERNAL_STATUS WHEN '0001' THEN DECODE(
+                      BLIF_LISTINGS.ACT_IND, 'A', 1, 'I', 
+                      2, 0
+                    ) ELSE 0 END
+                  ) AS AWAITING_PRECHECK, 
+                  SUM (
+                    DECODE(
+                      BLIF_LISTINGS.INTERNAL_STATUS, '0002', 
+                      1, 0
+                    )
+                  ) AS AWAITING_BLIF_TO_DIRECTION, 
+                  SUM (
+                    DECODE(
+                      BLIF_LISTINGS.INTERNAL_STATUS, '0010', 
+                      1, 0
+                    )
+                  ) AS LOCKED_BY_AUTOMATION, 
+                  SUM (
+                    DECODE(
+                      BLIF_LISTINGS.INTERNAL_STATUS, '0015', 
+                      1, 0
+                    )
+                  ) AS FAILED_BLIF_TO_DIRECTION, 
+                  SUM (
+                    DECODE(
+                      BLIF_LISTINGS.INTERNAL_STATUS, '0032', 
+                      1, 0
+                    )
+                  ) AS AWAITING_ACK_ACCEPTED, 
+                  SUM (
+                    DECODE(
+                      BLIF_LISTINGS.INTERNAL_STATUS, '0031', 
+                      1, 0
+                    )
+                  ) AS AWAITING_ACK_REJECTED, 
+                  SUM (1) AS TOTAL_RECEIVED 
+                  FROM 
+                    BLIF_FILE 
+                    INNER JOIN BLIF_FILE_EXCH ON BLIF_FILE.BLIF_FILE_ID = BLIF_FILE_EXCH.BLIF_FILE_ID 
+                    INNER JOIN BLIF_LISTINGS ON BLIF_LISTINGS.BLIF_FILE_EXCH_ID = BLIF_FILE_EXCH.BLIF_FILE_EXCH_ID 
+                    LEFT OUTER JOIN BLIF_SPID ON BLIF_FILE.CLEC_SPID = BLIF_SPID.SPID 
+                  WHERE 
+                    FILE_STATUS = '1' 
+                    AND TELUS_IND = #{telusInd,jdbcType=VARCHAR}
+                  GROUP BY 
+                    CLEC_FILENAME, 
+                    EDI_FILENAME, 
+                    DT_DOWNLOADED, 
+                    BLIF_SPID.NAME, 
+                    BLIF_FILE.CLEC_PROV
+                ) y 
+                WHERE 
+                  (
+                    y.NEW + y.AWAITING_PRECHECK + y.AWAITING_BLIF_TO_DIRECTION + y.LOCKED_BY_AUTOMATION + y.FAILED_BLIF_TO_DIRECTION + y.AWAITING_ACK_ACCEPTED + y.AWAITING_ACK_REJECTED
+                  ) > 0
+              ) x
+          ) 
+        WHERE 
+          rn BETWEEN ${datatableInParams.displayStart} 
+          AND ${
+    datatableinparams.displayend
+} 
+        ORDER by rn

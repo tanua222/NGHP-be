@@ -1,0 +1,7 @@
+List<WebDownloadPageSingleRow> getDownloadPage(filtering: fileName,startDate,endDate; sort: fileName,downloadTime,status; pagination );
+
+datatype: 
+    private Long blifFileId;
+    private String fileName;
+    private Date downloadTime;
+    private String status;

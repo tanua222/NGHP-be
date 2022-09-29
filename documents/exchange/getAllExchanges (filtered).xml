@@ -1,0 +1,164 @@
+List<Exchange> getAllExchanges(filtering: abbrev, bookNum, exchangeFullName, secondAbbrev, sectionNum, npa; sorting; pagination);
+boolean addExchange(Exchange newExchange);
+boolean updateExchanges(List<Exchange> exchanges);
+boolean deleteExchanges(String abbrev[]);
+
+datatype Exchange
+    String abbrev; +
+    String bookNum; +
+    String exchangeFullName; +
+    String secondAbbrev; + 
+    String sectionNum; +
+    String npa[]; ? 
+    String createdUserId; +
+    String lastUpdatedUserId;+
+    Date createdTs; + 
+    Date lastUpdatedTs; +
+=======================================================
+<mapper namespace="com.telus.dirlistingmgmt.blif.mappers.ExchangeMapper">
+	<resultMap id="result" type="Exchange">
+		<result  />
+		<result property="exchangeFullName" column="EXCH_FULL_NAME" />
+		<result property="secondAbbrev" column="EXCH_ABBREV_2" />
+		<result property="bookNum" column="BOOK_NUM" />
+		<result property="sectionNum" column="SECTION_NUM" />
+		<result property="exchIndex" column="RN" />
+    		<result property="totalFilteredRows" column="RESULT_COUNT"/>
+		<collection property="npas" ofType="NpaExchange" resultMap="com.telus.dirlistingmgmt.blif.mappers.NpaExchangeMapper.result" columnPrefix="BNEM_" />
+	</resultMap>
+
+---------
+match with mapping:
+----
+property="abbrev"              column="EXCH_ABBREV"
+property="bookNum" 	       column="BOOK_NUM"
+property="exchangeFullName"    column="EXCH_FULL_NAME"
+property="secondAbbrev"        column="EXCH_ABBREV_2"
+property="sectionNum"          column="SECTION_NUM"
+property="npa[]"               column="???"
+property="createdUserId"       column="CREATE_USER_ID"
+property="lastUpdatedUserId"   column="LAST_UPDT_USER_ID"
+property="createdTs"           column="CREATE_TS"
+property="lastUpdatedTs"       column="LAST_UPDT_TS"
+------------
+as a final query:
+------------
+SELECT
+    y.*,
+    bnem.npa_exch_id    AS bnem_npa_exch_id,
+    bnem.npa            AS bnem_npa,
+    bnem.exch_abbrev    AS bnem_exch_abbrev
+FROM ( SELECT
+    *
+FROM ( SELECT
+    row_number() over
+(
+ORDER BY ${datatableInParams.sortCol} ${datatableInParams.sortDir}) rn, COUNT(*) OVER () as result_count, x.*
+		          FROM (
+		                SELECT bem.*
+		                  FROM blif_exch_mtnc bem
+		                 <if test="datatableInParams.sKeyword != null and datatableInParams.sKeyword != ''"> 
+		                 WHERE upper(bem.exch_abbrev) LIKE '%'||upper(trim(#{datatableInParams.sKeyword}))||'%'
+		                    OR upper(bem.exch_full_name) LIKE '%'||upper(trim(#{datatableInParams.sKeyword}))||'%'
+		                    OR upper(bem.exch_abbrev_2) LIKE '%'||upper(trim(#{datatableInParams.sKeyword}))||'%'
+		                    OR bem.book_num LIKE '%'||trim(#{datatableInParams.sKeyword})||'%'
+		                    OR bem.section_num LIKE '%'||trim(#{datatableInParams.sKeyword})||'%'
+		                 </if>
+		        ) x
+		    ) 
+            WHERE rn BETWEEN ${datatableInParams.displayStart} AND ${datatableInParams.displayEnd}
+		      ORDER BY rn
+		  )
+    y
+     left outer
+JOIN blif_npa_exch_mtnc bnem ON ( y.exch_abbrev = bnem.exch_abbrev )
+----
+filter query:
+
+----
+EXCH_ABBREV +
+EXCH_FULL_NAME +
+EXCH_ABBREV_2 +
+BOOK_NUM + 
+SECTION_NUM + 
+CREATE_TS -
+CREATE_USER_ID +
+LAST_UPDT_TS +
+LAST_UPDT_USER_ID +
+BNEM_NPA_EXCH_ID ?
+BNEM_NPA ?
+BNEM_EXCH_ABBREV ?
+
+RN ? - <result property="exchIndex" column="RN" /> - This columns is not in the search result
+RESULT_COUNT ? - <result property="totalFilteredRows" column="RESULT_COUNT"/> - This columns is not in the search result
+=======================================================
+	<select id="getFilteredExchanges" parameterType="map" resultMap="result">
+		SELECT y.*
+			  ,<include refid="com.telus.dirlistingmgmt.blif.mappers.NpaExchangeMapper.Base_Column_NpaExchange" />
+		FROM (
+		  SELECT *
+		  FROM (SELECT ROW_NUMBER() OVER (ORDER BY ${datatableInParams.sortCol} ${datatableInParams.sortDir}) rn, COUNT(*) OVER () as result_count, x.*
+		          FROM (
+		                SELECT bem.*
+		                  FROM blif_exch_mtnc bem
+		                 <if test="datatableInParams.sKeyword != null and datatableInParams.sKeyword != ''"> 
+		                 WHERE upper(bem.exch_abbrev) LIKE '%'||upper(trim(#{datatableInParams.sKeyword}))||'%'
+		                    OR upper(bem.exch_full_name) LIKE '%'||upper(trim(#{datatableInParams.sKeyword}))||'%'
+		                    OR upper(bem.exch_abbrev_2) LIKE '%'||upper(trim(#{datatableInParams.sKeyword}))||'%'
+		                    OR bem.book_num LIKE '%'||trim(#{datatableInParams.sKeyword})||'%'
+		                    OR bem.section_num LIKE '%'||trim(#{datatableInParams.sKeyword})||'%'
+		                 </if>
+		        ) x
+		    ) WHERE rn BETWEEN ${datatableInParams.displayStart} AND ${datatableInParams.displayEnd}
+		      ORDER BY rn
+		  ) y
+		  LEFT OUTER JOIN blif_npa_exch_mtnc bnem ON (y.exch_abbrev = bnem.exch_abbrev)
+	</select>
+-------------------------------------------------------
+	<sql id="Base_Column_NpaExchange" >
+		  bnem.NPA_EXCH_ID as BNEM_NPA_EXCH_ID,
+		  bnem.NPA as BNEM_NPA,
+		  bnem.EXCH_ABBREV as BNEM_EXCH_ABBREV
+	</sql>
+------------------------------------------------------
+as a query result:
+------------
+SELECT
+    bem.*,
+    bnem.npa_exch_id    AS bnem_npa_exch_id,
+    bnem.npa            AS bnem_npa,
+    bnem.exch_abbrev    AS bnem_exch_abbrev
+FROM
+    blif_exch_mtnc      bem
+    LEFT OUTER JOIN blif_npa_exch_mtnc  bnem ON ( bem.exch_abbrev = bnem.exch_abbrev )
+------------
+as the result columns:
+------------
+
+=======================================================
+class Exchange extends AbstractBlif
+    private String exchIndex;
+    private String abbrev;
+    private String bookNum;
+    private String exchangeFullName;
+    private String secondAbbrev;
+    private String sectionNum;
+    private String npa;
+    private int totalFilteredRows;
+    private List<NpaExchange> npas;
+    public static enum COLUMNS {
+    	EXCH_ABBREV,
+    	EXCH_FULL_NAME,
+    	EXCH_ABBREV_2,
+    	BOOK_NUM,
+    	SECTION_NUM,
+    	BNEM_NPA
+	}
+
+where
+
+class AbstractBlif 
+	protected String			createdUserId;
+	protected String			lastUpdatedUserId;
+	protected Date				createdTs;
+	protected Date				lastUpdatedTs;
