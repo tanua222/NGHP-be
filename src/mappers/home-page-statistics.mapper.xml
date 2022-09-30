@@ -77,8 +77,7 @@ WHERE
     ( y.new + y.awaiting_precheck + y.awaiting_blif_to_direction + y.locked_by_automation + y.failed_blif_to_direction + y.awaiting_ack_accepted +
     y.awaiting_ack_rejected ) > 0
             ) x )
-WHERE
-    RN BETWEEN (${paginationParam.offset}+1) AND (${paginationParam.offset}+${paginationParam.limit})
 ORDER by rn
+OFFSET ${paginationParam.offset} ROWS FETCH NEXT ${paginationParam.limit} ROWS ONLY
   </select>
 </mapper>

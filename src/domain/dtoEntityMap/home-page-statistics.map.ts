@@ -5,20 +5,22 @@ import { SortParam } from '../dto/haa-common.dto';
 export class HomePageStatisticsMap {
 
     static dtoFieldToEntityFieldMapping: any = {
+        clecFilename: 'clecFilename',
         ediFilename: 'ediFilename',
         dtDownloaded: 'dtDownloaded',
-        dtDownloadedPstFmt: 'dtDownloadedPstFmt',
-        name: 'name',
-        clecProv: 'clecProv',
-        new: 'new',
+        dateDownloadedFormattted: 'dtDownloadedPstFmt',
+        clec: 'name',
+        province: 'clecProv',
+        newFile: 'new',
         awaitingPrecheck: 'awaitingPrecheck',
         awaitingBlifToDirection: 'awaitingBlifToDirection',
         lockedByAutomation: 'lockedByAutomation',
         failedBlifToDirection: 'failedBlifToDirection',
-        awaitingAckAccepted: 'awaitingAckAccepted',
-        awaitingAckRejected: 'awaitingAckRejected',
+        awaitingAcknowledgementAccepted: 'awaitingAckAccepted',
+        awaitingAcknowledgementRejected: 'awaitingAckRejected',
         totalReceived: 'totalReceived',
-        totalProcessed: 'totalProcessed'
+        totalProcessed: 'totalProcessed',
+        totalFilteredRows: 'resultCount' // todo: should we include it to sort and output?
     };
 
     static entityToDto(entities: HomePageStatisticsEntity[]): HomePageStatisticsDto[] {
