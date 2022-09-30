@@ -17,6 +17,10 @@ export default class FileStatisticsService extends HaaBaseGetService<HomePageSta
     return true;
   }
 
+  isArray(): boolean {
+    return true;
+  }
+
   getQueryNameForRetrieve(entityQueryParams: HaaQueryParams): string {
     return 'homePageStatistics';
   }

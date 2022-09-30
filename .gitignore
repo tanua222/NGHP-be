@@ -76,3 +76,4 @@ chart/ivs-hierarchy/config
 /.vs
 /cert
 .history/*
+src/.history/*
