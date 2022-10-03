@@ -4,6 +4,7 @@
 
     <select id="getAllExchange">
 SELECT  
+    rn,
     y.EXCH_ABBREV,
     y.BOOK_NUM,
     y.EXCH_FULL_NAME,

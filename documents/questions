@@ -1,0 +1,19 @@
+
+1. in the current app implementation we are not able to sort on NPA
+2. pagination and Map<>
+3. how does grid works? (trim(#{filter}))
+4.  @sortableString()
+
+export default class HierarchyNodeEntity extends BaseEntity {
+  id: string;
+  ndeId: string;
+  ntpId: number;    
+  @sortableString() name: string;
+  effectiveDate: string;
+  endDate: string | null;
+  @sortableString() description1: string | null;
+
+
+  5* check again if debug log level works fine
+  6* requested IDEA for java code
+  7* requested a modern version of Visual Studio code

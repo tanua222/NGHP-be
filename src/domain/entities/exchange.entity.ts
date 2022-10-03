@@ -4,6 +4,7 @@ const transformer = require('json-transformer-node');
 
 // fixme
 export default class ExchangeEntity extends BaseEntity {
+  rn: string;
   bnemNpa: string;
   bnemNpaExchId: string;
   bookNum: string;
@@ -21,6 +22,7 @@ export default class ExchangeEntity extends BaseEntity {
   static transformer = {
     mapping: {
       item: {
+        rn: 'RN',
         bnemNpa: 'BNEM_NPA',
         bnemNpaExchId: 'BNEM_NPA_EXCH_ID',
         bookNum: 'BOOK_NUM',

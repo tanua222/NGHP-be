@@ -11,6 +11,15 @@ import HaaBaseGetService from '../services/haa-base-get.service';
 
 const router: express.Router = express.Router();
 
+// todo: add a normal js docs
+// !!! if want to get a result your have to go to mapper and changes or remove WHERE conditions
+/**
+wget --no-check-certificate --quiet \
+  --method GET \
+  --timeout=0 \
+  --header '' \
+   'http://localhost:3006/ivsHierarchy/v1/homepage?offset=0&telusInd=N&webTZ=PST&limit=20'
+ */
 router.get('/', execute(FileStatisticsService, mapFileStatisticsGetReqToRequestParam));
 
 function execute<T extends HaaBaseGetService<HaaBaseDao>>(

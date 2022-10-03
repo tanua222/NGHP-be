@@ -5,6 +5,7 @@ import ExchangeEntity from '../entities/exchange.entity';
 
 export class ExchangeMap {
     static dtoFieldToEntityFieldMapping: any = {
+        rn: 'rn',
         abbrev: 'exchAbbrev',
         bookNum: 'bookNum',
         createdTs: 'createTs',
@@ -17,39 +18,39 @@ export class ExchangeMap {
     };
 
     static entityToDto(entities: ExchangeEntity[]): ExchangeDto[] {
-        const dtos = entities.map((entity) => {
-            const dto: ExchangeDto = new ExchangeDto();
-            // todo create dto structure
-            dto.abbrev = entity.exchAbbrev;
-            dto.bookNum = entity.bookNum;
-            dto.createdTs = entity.createTs;
-            dto.createdUserId = entity.createUserId;
-            dto.exchangeFullName = entity.exchFullName;
-            dto.lastUpdatedTs = entity.lastUpdtTs;
-            dto.lastUpdatedUserId = entity.lastUpdtUserId;
-            dto.secondAbbrev = entity.exchAbbrev2;
-            dto.sectionNum = entity.sectionNum;
+        const dtos: ExchangeDto[] = [];
+        let currDto: ExchangeDto | undefined = undefined;
+        let currRn: string | undefined = undefined;
 
-            // dto.npa = [];
-            // for (const e of entities) {
-            //     if (isNullOrUndefined(e.bnemNpaExchId) && isNullOrUndefined(e.bnemNpa)) {
-            //         continue;
-            //     }
-            //     const npaExchangeDto = new NpaExchangeDto();
-            //     npaExchangeDto.bnemNpa = e.bnemNpa;
-            //     npaExchangeDto.bnemNpaExchId = e.bnemNpaExchId;
-            //     dto.npa.push(npaExchangeDto);
-            // }
+        entities.forEach((entity) => {
+            const npaExchangeDto = new NpaExchangeDto();
 
-            return dto;
+            if (!isNullOrUndefined(entity.bnemNpaExchId) && !isNullOrUndefined(entity.bnemNpa)) {
+                npaExchangeDto.bnemNpa = entity.bnemNpa;
+                npaExchangeDto.bnemNpaExchId = entity.bnemNpaExchId;
+            }
+
+            if (!currDto || currRn !== entity.rn) {
+                currRn = entity.rn;
+
+                currDto = new ExchangeDto();
+                currDto.abbrev = entity.exchAbbrev;
+                currDto.bookNum = entity.bookNum;
+                currDto.createdTs = entity.createTs;
+                currDto.createdUserId = entity.createUserId;
+                currDto.exchangeFullName = entity.exchFullName;
+                currDto.lastUpdatedTs = entity.lastUpdtTs;
+                currDto.lastUpdatedUserId = entity.lastUpdtUserId;
+                currDto.secondAbbrev = entity.exchAbbrev2;
+                currDto.sectionNum = entity.sectionNum;
+                currDto.npa = [];
+                
+                dtos.push(currDto);
+            }
+            currDto.npa.push(npaExchangeDto);
         });
-
-        // todo 1: pack to map
-        // todo 2: convert to dtos
-
         return dtos;
     }
-
 
     static mapDtoToEntitySortParams(sortParams: SortParam[]): SortParam[] {
         if (!sortParams.length) {

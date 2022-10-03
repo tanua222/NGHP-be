@@ -11,6 +11,14 @@ import HaaBaseGetService from '../services/haa-base-get.service';
 
 const router: express.Router = express.Router();
 
+// todo add normal js docs
+/** 
+  wget --no-check-certificate --quiet \
+  --method GET \
+  --timeout=0 \
+  --header '' \
+   'http://localhost:3006/ivsHierarchy/v1/exchange?offset=0&sort=abbrev&filter=14&limit=10'
+**/
 router.get('/', execute(ExchangeService, mapExchangeGetReqToRequestParam));
 
 // todo: move to helper
