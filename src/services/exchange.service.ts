@@ -35,12 +35,10 @@ export default class ExchangeService extends HaaBaseGetService<ExchangeDao> {
     return ExchangeMap.mapDtoToEntitySortParams(sortParams);
   }
 
-  // fixme
   mapToEntityQueryParams(requestParam: ExchangeRequestParam): HaaQueryParams {
     const haaEntityQueryParams: ExchangeQueryParam = super.mapToEntityQueryParams(requestParam);
 
     haaEntityQueryParams.filter = requestParam.filter;
-    // haaEntityQueryParams.webTZ = requestParam.webTZ;
 
     return haaEntityQueryParams;
   }

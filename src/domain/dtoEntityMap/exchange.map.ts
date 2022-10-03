@@ -4,9 +4,16 @@ import { SortParam } from '../dto/haa-common.dto';
 import ExchangeEntity from '../entities/exchange.entity';
 
 export class ExchangeMap {
-    // todo 
     static dtoFieldToEntityFieldMapping: any = {
-        exchangeFullName: 'exchangeFullName'
+        abbrev: 'exchAbbrev',
+        bookNum: 'bookNum',
+        createdTs: 'createTs',
+        createdUserId: 'createUserId',
+        exchangeFullName: 'exchFullName',
+        lastUpdatedTs: 'lastUpdtTs',
+        lastUpdatedUserId: 'lastUpdtUserId',
+        secondAbbrev: 'exchAbbrev2',
+        sectionNum: 'sectionNum'
     };
 
     static entityToDto(entities: ExchangeEntity[]): ExchangeDto[] {
@@ -39,7 +46,7 @@ export class ExchangeMap {
 
         // todo 1: pack to map
         // todo 2: convert to dtos
-        
+
         return dtos;
     }
 
@@ -61,7 +68,7 @@ export class ExchangeMap {
     static getDefaultSortParam(): SortParam[] {
         return [
             {
-                fieldName: 'abbrev', // todo: what should be as a default?
+                fieldName: 'exchangeFullName', // todo: what should be as a default?
                 asc: false,
             },
         ];

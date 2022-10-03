@@ -22,7 +22,7 @@ FROM (
         FROM
             (
                 SELECT
-                    ROW_NUMBER() OVER( ORDER BY exch_abbrev DESC) rn,
+                    ROW_NUMBER() OVER( ORDER BY ${sortConditions}) rn,
                     COUNT(*) OVER()   AS result_count,
                     x.*
                 FROM
@@ -40,15 +40,15 @@ FROM (
                         FROM
                             blif_exch_mtnc bem
                         <if test="filter != undefined and filter != null and filter != ''"> 
-                                         WHERE upper(bem.exch_abbrev) LIKE '%'||upper(trim(#{filter}))||'%'
-                                            OR upper(bem.exch_full_name) LIKE '%'||upper(trim(#{filter}))||'%'
-                                            OR upper(bem.exch_abbrev_2) LIKE '%'||upper(trim(#{filter}))||'%'
-                                            OR bem.book_num LIKE '%'||trim(#{filter})||'%'
-                                            OR bem.section_num LIKE '%'||trim(#{filter})||'%'
+                        WHERE upper(bem.exch_abbrev) LIKE '%'||upper(trim(#{filter}))||'%'
+                            OR upper(bem.exch_full_name) LIKE '%'||upper(trim(#{filter}))||'%'
+                            OR upper(bem.exch_abbrev_2) LIKE '%'||upper(trim(#{filter}))||'%'
+                            OR bem.book_num LIKE '%'||trim(#{filter})||'%'
+                            OR bem.section_num LIKE '%'||trim(#{filter})||'%'
                         </if>
                     ) x
             ) 
-        WHERE RN BETWEEN (${paginationParam.offset}+1) AND (${paginationParam.offset}+${paginationParam.limit})
+        WHERE RN BETWEEN (${paginationParam.offset} + 1) AND (${paginationParam.offset} + ${paginationParam.limit})
         ORDER BY rn
 		  ) y
 LEFT OUTER JOIN blif_npa_exch_mtnc bnem ON ( y.exch_abbrev = bnem.exch_abbrev )
