@@ -3,20 +3,20 @@ import {
   AssginedEntityRequestParam,
   AssignableTollfreeRequestParam,
   AssignedUserReportRequestParam,
-  AssignedUsersRequestParam,
+  ExchangeRequestParam,
   HaaExtractCreateRequestParam,
   HierarchyNodeRequestParam,
   HierarchyTreeRequestParam,
+  HomePageStatisticsRequestParam,
+  NodeEntityRequestParam,
   PaginationParam,
   RequestParam,
   SortParam,
-  UserReportDetailRequestParam,
-  HomePageStatisticsRequestParam
+  UserReportDetailRequestParam
 } from '../../domain/dto/haa-common.dto';
 import { AppConfig } from '../../utils/app-config';
-import { COMMA_SEPARATOR, ENTITY_TYPE, GUI_SORT_DESC_OPERATOR, Language } from '../../utils/constants';
-import { getLoginUser, isNull, getLanguageCode } from '../../utils/util';
-import { NodeEntityRequestParam } from '../../domain/dto/haa-common.dto';
+import { COMMA_SEPARATOR, ENTITY_TYPE, GUI_SORT_DESC_OPERATOR } from '../../utils/constants';
+import { getLanguageCode, getLoginUser, isNull } from '../../utils/util';
 const config = <AppConfig>require('config');
 
 /**
@@ -330,6 +330,22 @@ export const mapFileStatisticsGetReqToRequestParam = (req: Request, res: Respons
 
   requestParam.telusInd = telusInd;
   requestParam.webTZ = webTZ;
+
+  return requestParam;
+};
+
+// fixme move to heplper
+export const mapExchangeGetReqToRequestParam = (req: Request, res: Response): ExchangeRequestParam => {
+  const context = res.locals.context;
+  context.log.debug('mapExchangeGetReqToRequestParam triggered');
+  let requestParam = mapCommonGetReqToRequestParam(req, res, new ExchangeRequestParam());
+  requestParam = mapCommonFeatureReqToRequestParam(req, res, requestParam);
+
+  context.log.debug('mapExchangeGetReqToRequestParam success with requestParam', requestParam);
+
+  const { filter }: any = req.query;
+
+  requestParam.filter = filter;
 
   return requestParam;
 };

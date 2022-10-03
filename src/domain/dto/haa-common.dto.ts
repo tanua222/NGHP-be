@@ -131,6 +131,10 @@ export class HomePageStatisticsRequestParam extends RequestParam {
   webTZ?: string;
 }
 
+export class ExchangeRequestParam extends RequestParam {
+  filter?: string;
+}
+
 export class UserReportAssignInputRequestParam {
   parentHierarchyNodeId: string;
   reportId: number[];

@@ -5,22 +5,22 @@ import 'reflect-metadata';
 import { authentication } from './middleware/authentication/authentication';
 import { authorization } from './middleware/authorization/authorization';
 import passport from './middleware/passport';
+import { userInformationMiddleware } from './middleware/userinformation/userinformation';
+import fileStatisticsRouter from './routers/file-statistics.router';
+import exchangeRouter from './routers/exchange.router';
 import deleteRouter from './routers/haa-delete.router';
 import getRouter from './routers/haa-get.router';
 import patchRouter from './routers/haa-patch.router';
 import postRouter from './routers/haa-post.router';
-import taskPostRouter from './routers/haa-task-post.router';
 import taskPatchRouter from './routers/haa-task-patch.router';
+import taskPostRouter from './routers/haa-task-post.router';
 import healthCheckRouter from './routers/health-check.router';
-import fileStatisticsRouter from './routers/file-statistics.router';
 import metricsRouter from './routers/metrics.router';
 import { AppConfig } from './utils/app-config';
 import { contextMiddleware } from './utils/context';
 import DataBase from './utils/database';
 import log from './utils/logger';
 import mapperLoader from './utils/mapperLoader';
-import { userInformationMiddleware } from './middleware/userinformation/userinformation';
-import { orderValidatorOpts } from './utils/validationUtils';
 
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
@@ -55,6 +55,7 @@ DataBase.initialize()
     app.use(contextMiddleware);
     app.use(`${config.server.contextPath}/health`, healthCheckRouter);
     app.use(`${config.server.contextPath}/homepage`, fileStatisticsRouter);
+    app.use(`${config.server.contextPath}/exchange`, exchangeRouter); // todo: should we move it down
 
     app.use(authentication);
     app.use(userInformationMiddleware);

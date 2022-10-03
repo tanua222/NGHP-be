@@ -31,15 +31,15 @@ datatype Exchange
 match with mapping:
 ----
 property="abbrev"              column="EXCH_ABBREV"
-property="bookNum" 	       column="BOOK_NUM"
+property="bookNum" 	           column="BOOK_NUM"
+property="createdTs"           column="CREATE_TS"
+property="createdUserId"       column="CREATE_USER_ID"
 property="exchangeFullName"    column="EXCH_FULL_NAME"
+property="lastUpdatedTs"       column="LAST_UPDT_TS"
+property="lastUpdatedUserId"   column="LAST_UPDT_USER_ID"
+property="npa[]"               column="???"
 property="secondAbbrev"        column="EXCH_ABBREV_2"
 property="sectionNum"          column="SECTION_NUM"
-property="npa[]"               column="???"
-property="createdUserId"       column="CREATE_USER_ID"
-property="lastUpdatedUserId"   column="LAST_UPDT_USER_ID"
-property="createdTs"           column="CREATE_TS"
-property="lastUpdatedTs"       column="LAST_UPDT_TS"
 ------------
 as a final query:
 ------------

@@ -129,3 +129,8 @@ export class HomePageStatisticsQueryParam extends HaaQueryParams {
   telusInd?: string;
   webTZ?: string;
 }
+
+// fixme
+export class ExchangeQueryParam extends HaaQueryParams {
+  filter?: string;
+}
