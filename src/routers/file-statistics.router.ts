@@ -1,13 +1,9 @@
-import express, { Request, Response } from 'express';
-import HaaBaseDao from '../dao/haa-base.dao';
-import { RequestParam } from '../domain/dto/haa-common.dto';
-import ResponseDto from '../domain/dto/response.dto';
+import express from 'express';
 import {
-  mapFeatureGetReqToRequestParam,
   mapFileStatisticsGetReqToRequestParam
 } from '../middleware/haa/haa-req-mapper';
 import FileStatisticsService from '../services/file-statistics.service';
-import HaaBaseGetService from '../services/haa-base-get.service';
+import { executeGet } from '../utils/execute';
 
 const router: express.Router = express.Router();
 
@@ -20,24 +16,6 @@ wget --no-check-certificate --quiet \
   --header '' \
    'http://localhost:3006/ivsHierarchy/v1/homepage?offset=0&telusInd=N&webTZ=PST&limit=20'
  */
-router.get('/', execute(FileStatisticsService, mapFileStatisticsGetReqToRequestParam));
-
-function execute<T extends HaaBaseGetService<HaaBaseDao>>(
-  ServiceClass: new (...args: any[]) => T,
-  requestParamFn?: (req: Request, res: Response) => RequestParam
-): any {
-  return async (req: Request, res: Response) => {
-    const context = res.locals.context;
-    const params = (requestParamFn && requestParamFn(req, res)) || mapFeatureGetReqToRequestParam(req, res);
-
-    try {
-      const service = new ServiceClass(context);
-      const featureDto = await service.retrieveHaaEntity(params);
-      ResponseDto.sendResponse(featureDto, res);
-    } catch (error) {
-      ResponseDto.sendResponse(ResponseDto.catchResponse(context, error), res);
-    }
-  };
-}
+router.get('/', executeGet(FileStatisticsService, mapFileStatisticsGetReqToRequestParam));
 
 export default router;
