@@ -1,0 +1,156 @@
+{
+	"info": {
+		"_postman_id": "d8b6c0c9-b18b-459f-a558-bd573289db08",
+		"name": "NGHP-be",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "23374154"
+	},
+	"item": [
+		{
+			"name": "file-statistics",
+			"item": [
+				{
+					"name": "/ivsHierarchy/v1/homepage",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3006/ivsHierarchy/v1/homepage?offset=0&telusInd=N&webTZ=PST&limit=20",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3006",
+							"path": [
+								"ivsHierarchy",
+								"v1",
+								"homepage"
+							],
+							"query": [
+								{
+									"key": "offset",
+									"value": "0"
+								},
+								{
+									"key": "telusInd",
+									"value": "N"
+								},
+								{
+									"key": "webTZ",
+									"value": "PST"
+								},
+								{
+									"key": "uuid",
+									"value": "master",
+									"disabled": true
+								},
+								{
+									"key": "parentHierarchyNodeId",
+									"value": "600004082",
+									"disabled": true
+								},
+								{
+									"key": "sort",
+									"value": "clecFilename",
+									"disabled": true
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "exchange",
+			"item": [
+				{
+					"name": "/ivsHierarchy/v1/exchange",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3006/ivsHierarchy/v1/exchange?offset=0&sort=abbrev&filter=14&limit=10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3006",
+							"path": [
+								"ivsHierarchy",
+								"v1",
+								"exchange"
+							],
+							"query": [
+								{
+									"key": "offset",
+									"value": "0"
+								},
+								{
+									"key": "uuid",
+									"value": "master",
+									"disabled": true
+								},
+								{
+									"key": "parentHierarchyNodeId",
+									"value": "600004082",
+									"disabled": true
+								},
+								{
+									"key": "sort",
+									"value": "abbrev"
+								},
+								{
+									"key": "filter",
+									"value": "14"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "/ivsHierarchy/v1/health",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3006/ivsHierarchy/v1/health",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3006",
+					"path": [
+						"ivsHierarchy",
+						"v1",
+						"health"
+					],
+					"query": [
+						{
+							"key": "uuid",
+							"value": "master",
+							"disabled": true
+						},
+						{
+							"key": "parentHierarchyNodeId",
+							"value": "600004082",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
