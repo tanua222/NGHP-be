@@ -45,7 +45,7 @@ DataBase.initialize()
         saveUninitialized: true,
         secret: process.env.JWT_SESSION_SECRET,
         rolling: true,
-        cookie: { maxAge: 60 * 60 * 1000, secure: true }, // set cookie to 1 hr TODO put to env
+        cookie: { maxAge: 60 * 60 * 1000, secure: true }, // set cookie to 1 hr put to env
         unset: 'destroy',
       })
     );
@@ -55,7 +55,7 @@ DataBase.initialize()
     app.use(contextMiddleware);
     app.use(`${config.server.contextPath}/health`, healthCheckRouter);
     app.use(`${config.server.contextPath}/homepage`, fileStatisticsRouter);
-    app.use(`${config.server.contextPath}/exchange`, exchangeRouter); // todo: should we move it down
+    app.use(`${config.server.contextPath}/exchange`, exchangeRouter);
 
     app.use(authentication);
     app.use(userInformationMiddleware);

@@ -4,5 +4,4 @@ export default class HaaUserRoleDto extends BaseDto {
   roleId: string;
   roleDescription: string;
   roleName: string;
-  cascadeInd: string; // TODO: change to number as in spec?
-}
+  cascadeInd: string; 

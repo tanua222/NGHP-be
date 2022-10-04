@@ -1,14 +1,15 @@
+import { sortableString } from '../../utils/util';
 import ResponseDto from '../dto/response.dto';
 import BaseEntity from './base.entity';
 const transformer = require('json-transformer-node');
 
 export default class HomePageStatisticsEntity extends BaseEntity {
   resultCount: number;
-  clecFilename: string;
-  ediFilename: string;
-  dtDownloadedPstFmt: string;
-  name: string;
-  clecProv: string;
+  @sortableString() clecFilename: string;
+  @sortableString() ediFilename: string;
+  @sortableString() dtDownloadedPstFmt: string;
+  @sortableString() name: string;
+  @sortableString() clecProv: string;
   new: number;
   awaitingPrecheck: number;
   awaitingBlifToDirection: number;
@@ -18,7 +19,6 @@ export default class HomePageStatisticsEntity extends BaseEntity {
   awaitingAckRejected: number;
   totalReceived: number;
   totalProcessed: number;
-  // TODO: Do we need to define all type?
 
   static transformer = {
     mapping: {
