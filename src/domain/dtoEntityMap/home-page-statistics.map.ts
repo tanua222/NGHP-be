@@ -20,7 +20,7 @@ export class HomePageStatisticsMap {
         awaitingAcknowledgementRejected: 'awaitingAckRejected',
         totalReceived: 'totalReceived',
         totalProcessed: 'totalProcessed',
-        totalFilteredRows: 'resultCount' // todo: should we include it to sort and output?
+        totalFilteredRows: 'resultCount'
     };
 
     static entityToDto(entities: HomePageStatisticsEntity[]): HomePageStatisticsDto[] {

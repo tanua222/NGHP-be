@@ -1,23 +1,22 @@
+import { sortableString } from '../../utils/util';
 import ResponseDto from '../dto/response.dto';
 import BaseEntity from './base.entity';
 const transformer = require('json-transformer-node');
 
-// fixme
 export default class ExchangeEntity extends BaseEntity {
   rn: number;
   bnemNpa: string;
   bnemNpaExchId: number;
-  bookNum: string;
+  @sortableString() bookNum: string;
   createTs: string;
   createUserId: string;
-  exchAbbrev2: string;
-  exchAbbrev: string;
-  exchFullName: string;
-  lastUpdtTs: string;
-  lastUpdtUserId: string;
+  @sortableString() exchAbbrev2: string;
+  @sortableString() exchAbbrev: string;
+  @sortableString() exchFullName: string;
+  @sortableString() lastUpdtTs: string;
+  @sortableString() lastUpdtUserId: string;
   resultCount: number;
-  sectionNum: string;
-  // TODO: Do we need to define types?
+  @sortableString() sectionNum: string;
 
   static transformer = {
     mapping: {
