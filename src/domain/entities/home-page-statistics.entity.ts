@@ -3,21 +3,21 @@ import BaseEntity from './base.entity';
 const transformer = require('json-transformer-node');
 
 export default class HomePageStatisticsEntity extends BaseEntity {
-  resultCount: string;
+  resultCount: number;
   clecFilename: string;
   ediFilename: string;
   dtDownloadedPstFmt: string;
   name: string;
   clecProv: string;
-  new: string;
-  awaitingPrecheck: string;
-  awaitingBlifToDirection: string;
-  lockedByAutomation: string;
-  failedBlifToDirection: string;
-  awaitingAckAccepted: string;
-  awaitingAckRejected: string;
-  totalReceived: string;
-  totalProcessed: string;
+  new: number;
+  awaitingPrecheck: number;
+  awaitingBlifToDirection: number;
+  lockedByAutomation: number;
+  failedBlifToDirection: number;
+  awaitingAckAccepted: number;
+  awaitingAckRejected: number;
+  totalReceived: number;
+  totalProcessed: number;
   // TODO: Do we need to define all type?
 
   static transformer = {
