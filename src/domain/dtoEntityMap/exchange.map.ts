@@ -20,7 +20,7 @@ export class ExchangeMap {
     static entityToDto(entities: ExchangeEntity[]): ExchangeDto[] {
         const dtos: ExchangeDto[] = [];
         let currDto: ExchangeDto | undefined = undefined;
-        let currRn: string | undefined = undefined;
+        let currRn: number | undefined = undefined;
 
         entities.forEach((entity) => {
             const npaExchangeDto = new NpaExchangeDto();

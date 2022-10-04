@@ -1,7 +1,6 @@
 import { BaseDto } from './haa-common.dto';
 
 export default class ExchangeDto extends BaseDto {
-     // todo datatypes
     abbrev: string;
     bookNum: string;
     createdTs: string; 
@@ -15,6 +14,6 @@ export default class ExchangeDto extends BaseDto {
 }
 
 export class NpaExchangeDto extends BaseDto {
-    bnemNpaExchId: string;
+    bnemNpaExchId: number;
     bnemNpa: string;
     }

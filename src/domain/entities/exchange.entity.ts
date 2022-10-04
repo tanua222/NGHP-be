@@ -4,9 +4,9 @@ const transformer = require('json-transformer-node');
 
 // fixme
 export default class ExchangeEntity extends BaseEntity {
-  rn: string;
+  rn: number;
   bnemNpa: string;
-  bnemNpaExchId: string;
+  bnemNpaExchId: number;
   bookNum: string;
   createTs: string;
   createUserId: string;
@@ -15,7 +15,7 @@ export default class ExchangeEntity extends BaseEntity {
   exchFullName: string;
   lastUpdtTs: string;
   lastUpdtUserId: string;
-  resultCount: string;
+  resultCount: number;
   sectionNum: string;
   // TODO: Do we need to define types?
 
