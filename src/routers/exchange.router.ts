@@ -2,7 +2,7 @@ import express from 'express';
 import {
   mapExchangeGetReqToRequestParam
 } from '../middleware/haa/haa-req-mapper';
-import ExchangeService from '../services/exchange.service';
+import ExchangeGetService from '../services/exchange/exchange-get.service';
 import { executeGet } from '../utils/execute';
 
 const router: express.Router = express.Router();
@@ -15,6 +15,6 @@ const router: express.Router = express.Router();
   --header '' \
    'http://localhost:3006/ivsHierarchy/v1/exchange?offset=0&sort=abbrev&filter=14&limit=10'
 **/
-router.get('/', executeGet(ExchangeService, mapExchangeGetReqToRequestParam));
+router.get('/', executeGet(ExchangeGetService, mapExchangeGetReqToRequestParam));
 
 export default router;

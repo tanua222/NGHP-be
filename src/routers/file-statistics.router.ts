@@ -2,7 +2,7 @@ import express from 'express';
 import {
   mapFileStatisticsGetReqToRequestParam
 } from '../middleware/haa/haa-req-mapper';
-import FileStatisticsService from '../services/file-statistics.service';
+import FileStatisticsGetService from '../services/file-statistics/file-statistics-get.service';
 import { executeGet } from '../utils/execute';
 
 const router: express.Router = express.Router();
@@ -16,6 +16,6 @@ wget --no-check-certificate --quiet \
   --header '' \
    'http://localhost:3006/ivsHierarchy/v1/homepage?offset=0&telusInd=N&webTZ=PST&limit=20'
  */
-router.get('/', executeGet(FileStatisticsService, mapFileStatisticsGetReqToRequestParam));
+router.get('/', executeGet(FileStatisticsGetService, mapFileStatisticsGetReqToRequestParam));
 
 export default router;

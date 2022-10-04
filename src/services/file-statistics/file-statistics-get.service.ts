@@ -1,14 +1,14 @@
-import HomePageStatisticsDao from '../dao/home-page-statistics.dao';
-import { RequestParam, SortParam } from '../domain/dto/haa-common.dto';
-import { HomePageStatisticsMap } from '../domain/dtoEntityMap/home-page-statistics.map';
-import HaaQueryParams, { HomePageStatisticsQueryParam } from '../domain/entities/haa-query-param.entity';
-import HomePageStatisticsEntity from '../domain/entities/home-page-statistics.entity';
-import Context from '../utils/context';
-import HaaBaseGetService from './haa-base-get.service';
-import { HomePageStatisticsRequestParam } from '../domain/dto/haa-common.dto';
+import HomePageStatisticsDao from '../../dao/home-page-statistics.dao';
+import { RequestParam, SortParam } from '../../domain/dto/haa-common.dto';
+import { HomePageStatisticsMap } from '../../domain/dtoEntityMap/home-page-statistics.map';
+import HaaQueryParams, { HomePageStatisticsQueryParam } from '../../domain/entities/haa-query-param.entity';
+import HomePageStatisticsEntity from '../../domain/entities/home-page-statistics.entity';
+import Context from '../../utils/context';
+import HaaBaseGetService from '../haa-base-get.service';
+import { HomePageStatisticsRequestParam } from '../../domain/dto/haa-common.dto';
 
 
-export default class FileStatisticsService extends HaaBaseGetService<HomePageStatisticsDao> {
+export default class FileStatisticsGetService extends HaaBaseGetService<HomePageStatisticsDao> {
   constructor(context: Context) {
     super({ context, dao: new HomePageStatisticsDao({ context: context }) });
   }

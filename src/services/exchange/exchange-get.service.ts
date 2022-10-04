@@ -1,14 +1,14 @@
-import ExchangeDao from '../dao/exchange.dao';
-import { RequestParam, SortParam } from '../domain/dto/haa-common.dto';
-import { ExchangeMap } from '../domain/dtoEntityMap/exchange.map';
-import HaaQueryParams, { ExchangeQueryParam } from '../domain/entities/haa-query-param.entity';
-import ExchangeEntity from '../domain/entities/exchange.entity';
-import Context from '../utils/context';
-import HaaBaseGetService from './haa-base-get.service';
-import { ExchangeRequestParam } from '../domain/dto/haa-common.dto';
+import ExchangeDao from '../../dao/exchange.dao';
+import { RequestParam, SortParam } from '../../domain/dto/haa-common.dto';
+import { ExchangeMap } from '../../domain/dtoEntityMap/exchange.map';
+import HaaQueryParams, { ExchangeQueryParam } from '../../domain/entities/haa-query-param.entity';
+import ExchangeEntity from '../../domain/entities/exchange.entity';
+import Context from '../../utils/context';
+import HaaBaseGetService from '../haa-base-get.service';
+import { ExchangeRequestParam } from '../../domain/dto/haa-common.dto';
 
 
-export default class ExchangeService extends HaaBaseGetService<ExchangeDao> {
+export default class ExchangeGetService extends HaaBaseGetService<ExchangeDao> {
   constructor(context: Context) {
     super({ context, dao: new ExchangeDao({ context: context }) });
   }
