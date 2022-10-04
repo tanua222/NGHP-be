@@ -334,7 +334,7 @@ export const mapFileStatisticsGetReqToRequestParam = (req: Request, res: Respons
   return requestParam;
 };
 
-// fixme move to heplper
+// todo move to heplper
 export const mapExchangeGetReqToRequestParam = (req: Request, res: Response): ExchangeRequestParam => {
   const context = res.locals.context;
   context.log.debug('mapExchangeGetReqToRequestParam triggered');

@@ -25,12 +25,10 @@ export default class ExchangeGetService extends HaaBaseGetService<ExchangeDao> {
     return 'getAllExchange';
   }
 
-  // fixme
   mapEntityToDto(entity: ExchangeEntity[]) {
     return ExchangeMap.entityToDto(entity);
   }
 
-  // fixme
   getDtoToEntitySortParams(sortParams: SortParam[]): SortParam[] {
     return ExchangeMap.mapDtoToEntitySortParams(sortParams);
   }

@@ -130,7 +130,6 @@ export class HomePageStatisticsQueryParam extends HaaQueryParams {
   webTZ?: string;
 }
 
-// fixme
 export class ExchangeQueryParam extends HaaQueryParams {
   filter?: string;
 }
