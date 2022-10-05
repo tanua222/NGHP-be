@@ -7,7 +7,7 @@ export default class HomePageStatisticsEntity extends BaseEntity {
   resultCount: number;
   @sortableString() clecFilename: string;
   @sortableString() ediFilename: string;
-  @sortableString() dtDownloadedPstFmt: string;
+  dtDownloadedPstFmt: string;
   @sortableString() name: string;
   @sortableString() clecProv: string;
   new: number;

@@ -7,7 +7,6 @@ export class HomePageStatisticsMap {
     static dtoFieldToEntityFieldMapping: any = {
         clecFilename: 'clecFilename',
         ediFilename: 'ediFilename',
-        dtDownloaded: 'dtDownloaded',
         dateDownloadedFormattted: 'dtDownloadedPstFmt',
         clec: 'name',
         province: 'clecProv',
@@ -63,7 +62,7 @@ export class HomePageStatisticsMap {
     static getDefaultSortParam(): SortParam[] {
         return [
             {
-                fieldName: 'ediFilename',
+                fieldName: 'dateDownloadedFormattted',
                 asc: false,
             },
         ];
