@@ -1,4 +1,4 @@
-List<Exchange> getAllExchanges(filtering: abbrev, bookNum, exchangeFullName, secondAbbrev, sectionNum, npa; sorting; pagination);
+List<Exchange> getAllExchanges(filtering: abbrev, bookNum, exchangeFullName, secondAbbrev, sectionNum; sorting; pagination);
 boolean addExchange(Exchange newExchange);
 boolean updateExchanges(List<Exchange> exchanges);
 boolean deleteExchanges(String abbrev[]);
