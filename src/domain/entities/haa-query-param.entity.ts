@@ -115,14 +115,14 @@ export class HaaExtractsQueryParams extends HaaQueryParams {
 
 export class HaaCreateExtractsQueryParams extends HaaQueryParams {
   hierarchyNodeId?: string;
-  extractId?:number;
-  userId?:string;
-  conId?:number;
-  languageCode?:Language;
-  status?:string;
-  extractFileName?:string;
-  extractFile?:any;
-  message?:string;
+  extractId?: number;
+  userId?: string;
+  conId?: number;
+  languageCode?: Language;
+  status?: string;
+  extractFileName?: string;
+  extractFile?: any;
+  message?: string;
 }
 
 export class HomePageStatisticsQueryParam extends HaaQueryParams {
@@ -130,6 +130,24 @@ export class HomePageStatisticsQueryParam extends HaaQueryParams {
   webTZ?: string;
 }
 
-export class ExchangeQueryParam extends HaaQueryParams {
+export class ExchangeGetQueryParam extends HaaQueryParams {
   filter?: string;
+}
+
+export class ExchangeAddQueryParam extends HaaQueryParams {
+  abbrev: string;
+  bookNum: string;
+  createdTs?: string;
+  createdUserId: string;
+  exchangeFullName: string;
+  lastUpdatedTs?: string;
+  lastUpdatedUserId: string;
+  npa: NpaExchangeQueryParam[];
+  secondAbbrev: string;
+  sectionNum: string;
+}
+
+export class NpaExchangeQueryParam{
+  bnemNpaExchId: number;
+  bnemNpa: string;
 }

@@ -1,0 +1,33 @@
+Meeting conclusion:
+    1. do two separate insert in db
+    2. but keep the validation prcess as before: 
+            public boolean addExchange(Exchange exchange) {
+                try{
+                    LOGGER.debug( "Entering addExchange method" );
+                    exchangeMapper.addNewExchange( exchange );
+                    
+                    if (!StringUtils.isEmpty(exchange.getNpa())) {
+                        String[] npas = exchange.getNpa().split(",");
+                        for(String npa: npas) {
+                            if (npaExchangeMapper.npaExists(npa) > 0) {
+                                NpaExchange npae = new NpaExchange();
+                                npae.setNpa(npa);
+                                npae.setExchAbbrev(exchange.getAbbrev());
+                                npae.setCreatedUserId(exchange.getLastUpdatedUserId());
+                                npae.setLastUpdatedUserId(exchange.getLastUpdatedUserId());
+                                npaExchangeMapper.insert(npae);
+                                LOGGER.debug("Added new NPA: " + npae);
+                            }
+                        }
+                    }
+                }
+                catch ( Exception e ) {
+                    String errMsg = "Error with addExchange";
+                    LOGGER.error( errMsg, e );
+                    return false;
+                }
+                return true;
+            }
+
+    3. return response as request but with an additional ID
+    4. return 201 

@@ -1,3 +1,4 @@
+//fixme
 export default class BaseEntity {
   entityNodeId: string;
   hierarchyNodeId: string;

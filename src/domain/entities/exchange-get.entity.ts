@@ -3,7 +3,7 @@ import ResponseDto from '../dto/response.dto';
 import BaseEntity from './base.entity';
 const transformer = require('json-transformer-node');
 
-export default class ExchangeEntity extends BaseEntity {
+export default class ExchangeGetEntity extends BaseEntity {
   rn: number;
   bnemNpa: string;
   bnemNpaExchId: number;
@@ -13,7 +13,7 @@ export default class ExchangeEntity extends BaseEntity {
   @sortableString() exchAbbrev2: string;
   @sortableString() exchAbbrev: string;
   @sortableString() exchFullName: string;
-  @sortableString() lastUpdtTs: string;
+  lastUpdtTs: string;
   @sortableString() lastUpdtUserId: string;
   resultCount: number;
   @sortableString() sectionNum: string;
@@ -44,7 +44,7 @@ export default class ExchangeEntity extends BaseEntity {
         result: [
           {
             list: 'data',
-            item: ExchangeEntity.transformer.mapping.item,
+            item: ExchangeGetEntity.transformer.mapping.item,
           },
         ],
       },
@@ -52,16 +52,16 @@ export default class ExchangeEntity extends BaseEntity {
   };
 
   // todo move to helper
-  static transform(json: any): ExchangeEntity[] {
+  static transform(json: any): ExchangeGetEntity[] {
     if (Array.isArray(json)) {
-      return transformer.transform({ data: json }, ExchangeEntity.transformerArray).result;
+      return transformer.transform({ data: json }, ExchangeGetEntity.transformerArray).result;
     }
     throw ResponseDto.internalError('Array is expected');
   }
 
   // todo move to helper
   static getDbColumnName(columnName: string): any {
-    const index = Object.keys(ExchangeEntity.transformer.mapping.item).findIndex((n1) => n1 == columnName);
-    return index > -1 ? Object.values(ExchangeEntity.transformer.mapping.item)[index] : undefined;
+    const index = Object.keys(ExchangeGetEntity.transformer.mapping.item).findIndex((n1) => n1 == columnName);
+    return index > -1 ? Object.values(ExchangeGetEntity.transformer.mapping.item)[index] : undefined;
   }
 }

@@ -1,16 +1,16 @@
-import ExchangeDao from '../../dao/exchange.dao';
+import ExchangeGetDao from '../../dao/exchange-get.dao';
 import { RequestParam, SortParam } from '../../domain/dto/haa-common.dto';
-import { ExchangeMap } from '../../domain/dtoEntityMap/exchange.map';
-import HaaQueryParams, { ExchangeQueryParam } from '../../domain/entities/haa-query-param.entity';
-import ExchangeEntity from '../../domain/entities/exchange.entity';
+import { ExchangeMap } from '../../domain/dtoEntityMap/exchange-get.map';
+import HaaQueryParams, { ExchangeGetQueryParam } from '../../domain/entities/haa-query-param.entity';
+import ExchangeGetEntity from '../../domain/entities/exchange-get.entity';
 import Context from '../../utils/context';
 import HaaBaseGetService from '../haa-base-get.service';
 import { ExchangeRequestParam } from '../../domain/dto/haa-common.dto';
 
 
-export default class ExchangeGetService extends HaaBaseGetService<ExchangeDao> {
+export default class ExchangeGetService extends HaaBaseGetService<ExchangeGetDao> {
   constructor(context: Context) {
-    super({ context, dao: new ExchangeDao({ context: context }) });
+    super({ context, dao: new ExchangeGetDao({ context: context }) });
   }
 
   isPaginationRequired(requestParam?: RequestParam): boolean {
@@ -25,7 +25,7 @@ export default class ExchangeGetService extends HaaBaseGetService<ExchangeDao> {
     return 'getAllExchange';
   }
 
-  mapEntityToDto(entity: ExchangeEntity[]) {
+  mapEntityToDto(entity: ExchangeGetEntity[]) {
     return ExchangeMap.entityToDto(entity);
   }
 
@@ -34,7 +34,7 @@ export default class ExchangeGetService extends HaaBaseGetService<ExchangeDao> {
   }
 
   mapToEntityQueryParams(requestParam: ExchangeRequestParam): HaaQueryParams {
-    const haaEntityQueryParams: ExchangeQueryParam = super.mapToEntityQueryParams(requestParam);
+    const haaEntityQueryParams: ExchangeGetQueryParam = super.mapToEntityQueryParams(requestParam);
 
     haaEntityQueryParams.filter = requestParam.filter;
 

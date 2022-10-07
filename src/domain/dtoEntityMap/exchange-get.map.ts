@@ -1,7 +1,7 @@
 import { isNullOrUndefined } from '../../utils/util';
 import ExchangeDto, { NpaExchangeDto } from '../dto/exchange.dto';
 import { SortParam } from '../dto/haa-common.dto';
-import ExchangeEntity from '../entities/exchange.entity';
+import ExchangeGetEntity from '../entities/exchange-get.entity';
 
 export class ExchangeMap {
     static dtoFieldToEntityFieldMapping: any = {
@@ -17,7 +17,7 @@ export class ExchangeMap {
         sectionNum: 'sectionNum'
     };
 
-    static entityToDto(entities: ExchangeEntity[]): ExchangeDto[] {
+    static entityToDto(entities: ExchangeGetEntity[]): ExchangeDto[] {
         const dtos: ExchangeDto[] = [];
         let currDto: ExchangeDto | undefined = undefined;
         let currRn: number | undefined = undefined;
