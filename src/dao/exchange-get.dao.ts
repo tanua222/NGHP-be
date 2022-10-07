@@ -1,8 +1,5 @@
 import { SortParam } from '../domain/dto/haa-common.dto';
-import { Error } from '../domain/dto/response.dto';
 import ExchangeGetEntity from '../domain/entities/exchange-get.entity';
-import ExchangePostEntity from '../domain/entities/exchange-post.entity';
-import { IvsConnection } from '../utils/database';
 import { BaseDaoOptions } from './base.dao';
 import HaaBaseDao from './haa-base.dao';
 
@@ -26,23 +23,5 @@ export default class ExchangeGetDao extends HaaBaseDao {
       });
     return sortConditions;
   }
-
-  async addExchange(params: any, conn?: IvsConnection) {
-    const mapperId = 'addExchange';
-
-    if (!conn) throw Error.noDbConnection(this.dbConfig.poolAlias, mapperId);
-
-    return await this.executeTask(mapperId, conn, { params });
-  }
-
-  
-  async addNpaExchange(params: any, conn?: IvsConnection) {
-    const mapperId = 'addNpaExchange';
-
-    if (!conn) throw Error.noDbConnection(this.dbConfig.poolAlias, mapperId);
-
-    return await this.executeTask(mapperId, conn, { params });
-  }
-
 
 }
