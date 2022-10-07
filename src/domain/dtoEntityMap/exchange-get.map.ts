@@ -1,5 +1,5 @@
 import { isNullOrUndefined } from '../../utils/util';
-import ExchangeDto, { NpaExchangeDto } from '../dto/exchange.dto';
+import ExchangeGetDto, { NpaExchangeGetDto } from '../dto/exchange-get.dto';
 import { SortParam } from '../dto/haa-common.dto';
 import ExchangeGetEntity from '../entities/exchange-get.entity';
 
@@ -17,23 +17,23 @@ export class ExchangeMap {
         sectionNum: 'sectionNum'
     };
 
-    static entityToDto(entities: ExchangeGetEntity[]): ExchangeDto[] {
-        const dtos: ExchangeDto[] = [];
-        let currDto: ExchangeDto | undefined = undefined;
+    static entityToDto(entities: ExchangeGetEntity[]): ExchangeGetDto[] {
+        const dtos: ExchangeGetDto[] = [];
+        let currDto: ExchangeGetDto | undefined = undefined;
         let currRn: number | undefined = undefined;
 
         entities.forEach((entity) => {
-            const npaExchangeDto = new NpaExchangeDto();
+            const npaExchangeGetDto = new NpaExchangeGetDto();
 
             if (!isNullOrUndefined(entity.bnemNpaExchId) && !isNullOrUndefined(entity.bnemNpa)) {
-                npaExchangeDto.bnemNpa = entity.bnemNpa;
-                npaExchangeDto.bnemNpaExchId = entity.bnemNpaExchId;
+                npaExchangeGetDto.bnemNpa = entity.bnemNpa;
+                npaExchangeGetDto.bnemNpaExchId = entity.bnemNpaExchId;
             }
 
             if (!currDto || currRn !== entity.rn) {
                 currRn = entity.rn;
 
-                currDto = new ExchangeDto();
+                currDto = new ExchangeGetDto();
                 currDto.abbrev = entity.exchAbbrev;
                 currDto.bookNum = entity.bookNum;
                 currDto.createdTs = entity.createTs;
@@ -47,7 +47,7 @@ export class ExchangeMap {
                 
                 dtos.push(currDto);
             }
-            currDto.npa.push(npaExchangeDto);
+            currDto.npa.push(npaExchangeGetDto);
         });
         return dtos;
     }
