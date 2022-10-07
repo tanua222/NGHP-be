@@ -3,7 +3,8 @@ import {
   mapExchangeGetReqToRequestParam
 } from '../middleware/haa/haa-req-mapper';
 import ExchangeGetService from '../services/exchange/exchange-get.service';
-import { executeGet } from '../utils/execute';
+import ExchangePostService from '../services/exchange/exchange-post.service';
+import { executeGet, executePostTask } from '../utils/execute';
 
 const router: express.Router = express.Router();
 
@@ -16,5 +17,32 @@ const router: express.Router = express.Router();
    'http://localhost:3006/ivsHierarchy/v1/exchange?offset=0&sort=abbrev&filter=14&limit=10'
 **/
 router.get('/', executeGet(ExchangeGetService, mapExchangeGetReqToRequestParam));
+/**
+  wget --no-check-certificate --quiet \
+  --method POST \
+  --timeout=0 \
+  --header 'Content-Type: application/json' \
+  --body-data '{
+    "abbrev": "test-55",
+    "bookNum": "06",
+    "createdTs": "2016-11-01T12:52:48.475Z",
+    "createdUserId": "DATA_SETUP",
+    "exchangeFullName": "ZEBALLOS",
+    "lastUpdatedTs": "2016-11-01T12:52:48.515Z",
+    "lastUpdatedUserId": "DATA_SETUP",
+    "secondAbbrev": null,
+    "sectionNum": "20",
+    "npa": [
+        {
+            "bnemNpa": "238"
+        },
+        {
+            "bnemNpa": "778"
+        }
+    ]
+}' \
+   'http://localhost:3006/ivsHierarchy/v1/exchange'
+ */
+router.post('/', executePostTask(ExchangePostService));
 
 export default router;

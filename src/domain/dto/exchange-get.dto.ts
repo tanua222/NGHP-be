@@ -3,10 +3,10 @@ import { BaseDto } from './haa-common.dto';
 export default class ExchangeGetDto extends BaseDto {
     abbrev: string;
     bookNum: string;
-    createdTs: string; 
+    createdTs?: string; 
     createdUserId: string;
     exchangeFullName: string;
-    lastUpdatedTs: string;
+    lastUpdatedTs?: string;
     lastUpdatedUserId: string;
     npa: NpaExchangeGetDto[];  
     secondAbbrev: string; 

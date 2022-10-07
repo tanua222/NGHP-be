@@ -137,17 +137,21 @@ export class ExchangeGetQueryParam extends HaaQueryParams {
 export class ExchangeAddQueryParam extends HaaQueryParams {
   abbrev: string;
   bookNum: string;
-  createdTs?: string;
+  createdTs: string;
   createdUserId: string;
   exchangeFullName: string;
-  lastUpdatedTs?: string;
+  lastUpdatedTs: string;
   lastUpdatedUserId: string;
   npa: NpaExchangeQueryParam[];
   secondAbbrev: string;
   sectionNum: string;
 }
 
-export class NpaExchangeQueryParam{
+export class NpaExchangeQueryParam {
   bnemNpaExchId: number;
   bnemNpa: string;
+  // data from Exchange entity
+  abbrev: string;
+  createdUserId: string;
+  lastUpdatedUserId: string;
 }

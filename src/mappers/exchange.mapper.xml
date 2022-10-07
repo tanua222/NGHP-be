@@ -3,55 +3,116 @@
 <mapper namespace="exchangeMapper">
 
     <select id="getAllExchange">
-SELECT  
-    rn,
-    y.EXCH_ABBREV,
-    y.BOOK_NUM,
-    y.EXCH_FULL_NAME,
-    y.EXCH_ABBREV_2,
-    y.SECTION_NUM,
-    y.CREATE_USER_ID,
-    y.LAST_UPDT_USER_ID,
-    y.CREATE_TS,
-    y.LAST_UPDT_TS,
-    bnem.npa_exch_id    AS bnem_npa_exch_id,
-    bnem.npa            AS bnem_npa,
-    result_count
-FROM ( 
-        SELECT
-            *
-        FROM
-            (
+        SELECT  
+            rn,
+            y.EXCH_ABBREV,
+            y.BOOK_NUM,
+            y.EXCH_FULL_NAME,
+            y.EXCH_ABBREV_2,
+            y.SECTION_NUM,
+            y.CREATE_USER_ID,
+            y.LAST_UPDT_USER_ID,
+            y.CREATE_TS,
+            y.LAST_UPDT_TS,
+            bnem.npa_exch_id    AS bnem_npa_exch_id,
+            bnem.npa            AS bnem_npa,
+            result_count
+        FROM ( 
                 SELECT
-                    ROW_NUMBER() OVER( ORDER BY ${sortConditions}) rn,
-                    COUNT(*) OVER()   AS result_count,
-                    x.*
+                    *
                 FROM
                     (
                         SELECT
-                            bem.EXCH_ABBREV,
-                            bem.BOOK_NUM,
-                            bem.EXCH_FULL_NAME,
-                            bem.EXCH_ABBREV_2,
-                            bem.SECTION_NUM,
-                            bem.CREATE_USER_ID,
-                            bem.LAST_UPDT_USER_ID,
-                            bem.CREATE_TS,
-                            bem.LAST_UPDT_TS
+                            ROW_NUMBER() OVER( ORDER BY ${sortConditions}) rn,
+                            COUNT(*) OVER()   AS result_count,
+                            x.*
                         FROM
-                            blif_exch_mtnc bem
-                        <if test="filter != undefined and filter != null and filter != ''"> 
-                        WHERE upper(bem.exch_abbrev) LIKE '%'||upper(trim(#{filter}))||'%'
-                            OR upper(bem.exch_full_name) LIKE '%'||upper(trim(#{filter}))||'%'
-                            OR upper(bem.exch_abbrev_2) LIKE '%'||upper(trim(#{filter}))||'%'
-                            OR bem.book_num LIKE '%'||trim(#{filter})||'%'
-                            OR bem.section_num LIKE '%'||trim(#{filter})||'%'
-                        </if>
-                    ) x
-            ) 
-        WHERE RN BETWEEN (${paginationParam.offset} + 1) AND (${paginationParam.offset} + ${paginationParam.limit})
-        ORDER BY rn
-		  ) y
-LEFT OUTER JOIN blif_npa_exch_mtnc bnem ON ( y.exch_abbrev = bnem.exch_abbrev )
+                            (
+                                SELECT
+                                    bem.EXCH_ABBREV,
+                                    bem.BOOK_NUM,
+                                    bem.EXCH_FULL_NAME,
+                                    bem.EXCH_ABBREV_2,
+                                    bem.SECTION_NUM,
+                                    bem.CREATE_USER_ID,
+                                    bem.LAST_UPDT_USER_ID,
+                                    bem.CREATE_TS,
+                                    bem.LAST_UPDT_TS
+                                FROM
+                                    blif_exch_mtnc bem
+                                <if test="filter != undefined and filter != null and filter != ''"> 
+                                WHERE upper(bem.exch_abbrev) LIKE '%'||upper(trim(#{filter}))||'%'
+                                    OR upper(bem.exch_full_name) LIKE '%'||upper(trim(#{filter}))||'%'
+                                    OR upper(bem.exch_abbrev_2) LIKE '%'||upper(trim(#{filter}))||'%'
+                                    OR bem.book_num LIKE '%'||trim(#{filter})||'%'
+                                    OR bem.section_num LIKE '%'||trim(#{filter})||'%'
+                                </if>
+                            ) x
+                    ) 
+                WHERE RN BETWEEN (${paginationParam.offset} + 1) AND (${paginationParam.offset} + ${paginationParam.limit})
+                ORDER BY rn
+                ) y
+        LEFT OUTER JOIN blif_npa_exch_mtnc bnem ON ( y.exch_abbrev = bnem.exch_abbrev )
     </select>
+
+    <insert id="addExchange">
+            INSERT
+
+            INTO 
+                BLIF_EXCH_MTNC
+                (
+                    EXCH_ABBREV, 
+                    EXCH_FULL_NAME, 
+                    EXCH_ABBREV_2,
+                    BOOK_NUM, 
+                    SECTION_NUM, 
+                    CREATE_TS,
+                    CREATE_USER_ID,
+                    LAST_UPDT_TS,
+                    LAST_UPDT_USER_ID
+                )
+
+            VALUES
+
+                (
+                    #{abbrev},
+                    #{exchangeFullName},
+                    #{secondAbbrev},
+                    #{bookNum},
+                    #{sectionNum},
+                    SYSDATE,
+                    #{createdUserId},
+                    SYSDATE,
+                    #{lastUpdatedUserId}
+                )
+    </insert>
+    
+    <select id="getNpaExchId">
+          SELECT 
+          BLIF_NPA_EXCH_MTNC_SEQ.nextVal as BNEM_NPA_EXCH_ID
+          from dual
+    </select>
+
+    <insert id="addNpaExchange">
+      INSERT INTO BLIF_NPA_EXCH_MTNC (
+				NPA_EXCH_ID, 
+				NPA, 
+				EXCH_ABBREV,
+				CREATE_TS,
+				CREATE_USER_ID,
+				LAST_UPDT_TS,
+				LAST_UPDT_USER_ID
+			)
+		VALUES
+			(
+				#{bnemNpaExchId},
+				#{bnemNpa},
+				#{abbrev},
+				SYSDATE,
+				#{createdUserId},
+				SYSDATE,
+				#{lastUpdatedUserId}
+			)
+	</insert>
+
 </mapper>
