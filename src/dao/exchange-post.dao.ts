@@ -1,7 +1,6 @@
 import { SortParam } from '../domain/dto/haa-common.dto';
 import { Error } from '../domain/dto/response.dto';
 import ExchangeGetEntity from '../domain/entities/exchange-get.entity';
-import ExchangePostEntity from '../domain/entities/exchange-post.entity';
 import { IvsConnection } from '../utils/database';
 import { BaseDaoOptions } from './base.dao';
 import HaaBaseDao from './haa-base.dao';
@@ -45,19 +44,23 @@ export default class ExchangePostDao extends HaaBaseDao {
   }  
 
   async getNpaExchId() {
-    // const mapperId = 'createNpaExchId';
-
-    // if (!conn) throw Error.noDbConnection(this.dbConfig.poolAlias, mapperId);
-
-    // return await this.executeTask(mapperId, conn, { params })
-    
     const dbResult = await this.findByFilters({
       query: 'getNpaExchId'
     });
-    return dbResult[0].BNEM_NPA_EXCH_ID
+    return dbResult[0].BNEM_NPA_EXCH_ID;
   
   }
 
+  async countNpa(params: any, conn?: IvsConnection) {
+    const mapperId = 'countNpa';
+
+    if (!conn) throw Error.noDbConnection(this.dbConfig.poolAlias, mapperId);
+
+    const dbResult = await this.executeTask(mapperId, conn, { params });
+
+    return dbResult.rows[0];
+  
+  }
   
 
 }

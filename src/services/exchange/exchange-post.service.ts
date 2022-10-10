@@ -1,11 +1,11 @@
 import ExchangePostDao from '../../dao/exchange-post.dao';
 import ExchangeGetDto from '../../domain/dto/exchange-get.dto';
 import { HaaBaseDto, RequestParam } from '../../domain/dto/haa-common.dto';
-import PaginationResult from '../../domain/dto/pagination-result.dto';
-import ResponseDto from '../../domain/dto/response.dto';
+import ResponseDto, { Error } from '../../domain/dto/response.dto';
 import { ExchangePostMap } from '../../domain/dtoEntityMap/exchange-post.map';
-import ExchangePostEntity, { NpaExchangePostEntity } from '../../domain/entities/exchange-post.entity';
-import { ExchangeAddQueryParam, NpaExchangeQueryParam } from '../../domain/entities/haa-query-param.entity';
+import ExchangePostEntity from '../../domain/entities/exchange-post.entity';
+import { ExchangeAddQueryParam } from '../../domain/entities/haa-query-param.entity';
+import { errorResponse } from '../../error/error-responses';
 import { ErrorMapping } from '../../error/error-responses-mapping';
 import { StatusCode } from '../../utils/constants';
 import Context from '../../utils/context';
@@ -36,6 +36,10 @@ export default class ExchangePostService extends HaaBaseService<ExchangePostDao>
     return await this.dao.addExchange(params, this.conn);
   }
 
+  async executeCountNpaDaoTask(params: any) {
+    return await this.dao.countNpa(params, this.conn);
+  }
+
 
   async executeAddNpaExchangesDaoTask(params: any) {
     params.rowsAffected = 0;
@@ -55,8 +59,8 @@ export default class ExchangePostService extends HaaBaseService<ExchangePostDao>
     let response = new ResponseDto<ExchangeGetDto>();
     // params && (response.result = params);
     if (params) {
-      response.result = { 
-        abbrev: params.abbrev, 
+      response.result = {
+        abbrev: params.abbrev,
         bookNum: params.bookNum,
         createdUserId: params.createdUserId,
         exchangeFullName: params.exchangeFullName,
@@ -71,28 +75,54 @@ export default class ExchangePostService extends HaaBaseService<ExchangePostDao>
     return response;
   }
 
-  //   fixme
-  async validateInput(queryParams: ExchangeAddQueryParam): Promise<void> {
-    // npa should exist
-    // execute get for each npa to BLIF_NPA_MTNC
-    // select count(*) as counter 
-    // from BLIF_NPA_MTNC
-    // where npa in (604,250,7708,60);
+  async validateInput(params: any): Promise<void> {
+    const errors: Error[] = [];
+    const npa = params.inputRequest?.npa;
 
-    //     const validationService: ExchangeValidatorService = new ExchangeValidatorService(this.dao);
-    //     await validationService.validateInputForCreate(queryParams);
+    if (!npa || npa.length === 0) {
+      errors.push(errorResponse(ErrorMapping.IVSHAA4404, this.context, { npa: [] }));
+      return ResponseDto.returnValidationErrors(errors);
+    }
+    const npaSet = new Set();
+
+    for (const item of npa) {
+      const bnemNpa = item.bnemNpa;
+      if (!bnemNpa) {
+        errors.push(errorResponse(ErrorMapping.IVSHAA4404, this.context, { item }));
+      }
+      npaSet.add(item.bnemNpa);
+    }
+
+    if (npa.length !== npaSet.size) {
+      errors.push(errorResponse(ErrorMapping.IVSHAA4420, this.context, { npa, bnemNpas: Array.from(npaSet) }));
+    }
+
+    if (errors.length > 0) {
+      return ResponseDto.returnValidationErrors(errors);
+    }
+
+    params.npaList = Array.from(npaSet).join();
+    const existedNpa = await this.executeCountNpaDaoTask(params);
+
+    if (npa.length !== existedNpa[0]) {
+      errors.push(errorResponse(ErrorMapping.IVSHAA4404, this.context, { npa: [] }));
+      return ResponseDto.returnValidationErrors(errors);
+    }
   }
-
-  // todo then fix mapping
 
   async executeTask(args: any): Promise<ResponseDto<any>> {
     this.conn = await IvsConnection.getConnection(this.dao.dbConfig, this.context);
-    this.log.debug('HaaUserReportService.executeTask connection retrieved: ', this.conn);
+    this.log.debug('ExchangePostService.executeTask connection retrieved: ', this.conn);
     try {
-      const params = await this.mapToEntityQueryParams(args.params);
+      let params = args.params;
+
+      // must be before 'mapToEntityQueryParams' to avoid redundant ids generation by Oracle DB
+      await this.validateInput(params);
+
+      params = await this.mapToEntityQueryParams(params);
+
       this.log.debug(`params`, params);
 
-      await this.validateInput(params);
       let result = await this.executeAddExchangeDaoTask(params);
 
       if (result) {
@@ -111,7 +141,7 @@ export default class ExchangePostService extends HaaBaseService<ExchangePostDao>
 
       return this.getResponse(params);
     } catch (error) {
-      this.log.error('HaaUserReportService.executeTask error occured:', error);
+      this.log.error('ExchangePostService.executeTask error occured:', error);
       await this.conn.rollback();
 
       if ((<any>error).errorNum === 20109) {
@@ -126,10 +156,10 @@ export default class ExchangePostService extends HaaBaseService<ExchangePostDao>
       if (this.conn) {
         try {
           this.conn.close();
-          this.log.debug('HaaUserReportService.executeTask connection closed');
+          this.log.debug('ExchangePostService.executeTask connection closed');
           this.conn = undefined;
         } catch (err) {
-          this.log.error('HaaUserReportService.executeTask finally with error!', err);
+          this.log.error('ExchangePostService.executeTask finally with error!', err);
         }
       }
     }

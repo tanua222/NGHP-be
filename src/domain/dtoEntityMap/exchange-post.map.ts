@@ -1,8 +1,5 @@
-import { isNullOrUndefined } from '../../utils/util';
-import ExchangeGetDto, { NpaExchangeGetDto } from '../dto/exchange-get.dto';
 import ExchangePostDto, { NpaExchangePostDto } from '../dto/exchange-post.dto';
-import { RequestParam, SortParam } from '../dto/haa-common.dto';
-import ExchangeGetEntity from '../entities/exchange-get.entity';
+import { RequestParam } from '../dto/haa-common.dto';
 import ExchangePostEntity, { NpaExchangePostEntity } from '../entities/exchange-post.entity';
 
 export class ExchangePostMap {

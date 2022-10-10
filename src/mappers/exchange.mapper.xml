@@ -86,7 +86,7 @@
                     #{lastUpdatedUserId}
                 )
     </insert>
-    
+
     <select id="getNpaExchId">
           SELECT 
           BLIF_NPA_EXCH_MTNC_SEQ.nextVal as BNEM_NPA_EXCH_ID
@@ -114,5 +114,11 @@
 				#{lastUpdatedUserId}
 			)
 	</insert>
+
+    <select id="countNpa">
+        SELECT COUNT(*) AS COUNTER 
+        FROM BLIF_NPA_MTNC
+        WHERE NPA IN (${npaList})
+    </select>
 
 </mapper>
