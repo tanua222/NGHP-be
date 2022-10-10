@@ -6,15 +6,15 @@ import ExchangeGetEntity from '../entities/exchange-get.entity';
 export class ExchangeMap {
     static dtoFieldToEntityFieldMapping: any = {
         rn: 'rn',
-        abbrev: 'exchAbbrev',
-        bookNum: 'bookNum',
+        abbreviation: 'exchAbbrev',
+        bookNumber: 'bookNumber',
         createdTs: 'createTs',
         createdUserId: 'createUserId',
-        exchangeFullName: 'exchFullName',
+        fullName: 'exchFullName',
         lastUpdatedTs: 'lastUpdtTs',
         lastUpdatedUserId: 'lastUpdtUserId',
-        secondAbbrev: 'exchAbbrev2',
-        sectionNum: 'sectionNum'
+        secondAbbreviation: 'exchAbbrev2',
+        sectionNumber: 'sectionNumber'
     };
 
     static entityToDto(entities: ExchangeGetEntity[]): ExchangeGetDto[] {
@@ -25,24 +25,24 @@ export class ExchangeMap {
         entities.forEach((entity) => {
             const npaExchangeGetDto = new NpaExchangeGetDto();
 
-            if (!isNullOrUndefined(entity.bnemNpaExchId) && !isNullOrUndefined(entity.bnemNpa)) {
-                npaExchangeGetDto.bnemNpa = entity.bnemNpa;
-                npaExchangeGetDto.bnemNpaExchId = entity.bnemNpaExchId;
+            if (!isNullOrUndefined(entity.id) && !isNullOrUndefined(entity.npa)) {
+                npaExchangeGetDto.npa = entity.npa;
+                npaExchangeGetDto.id = entity.id;
             }
 
             if (!currDto || currRn !== entity.rn) {
                 currRn = entity.rn;
 
                 currDto = new ExchangeGetDto();
-                currDto.abbrev = entity.exchAbbrev;
-                currDto.bookNum = entity.bookNum;
+                currDto.abbreviation = entity.exchAbbrev;
+                currDto.bookNumber = entity.bookNumber;
                 currDto.createdTs = entity.createTs;
                 currDto.createdUserId = entity.createUserId;
-                currDto.exchangeFullName = entity.exchFullName;
+                currDto.fullName = entity.exchFullName;
                 currDto.lastUpdatedTs = entity.lastUpdtTs;
                 currDto.lastUpdatedUserId = entity.lastUpdtUserId;
-                currDto.secondAbbrev = entity.exchAbbrev2;
-                currDto.sectionNum = entity.sectionNum;
+                currDto.secondAbbreviation = entity.exchAbbrev2;
+                currDto.sectionNumber = entity.sectionNumber;
                 currDto.npa = [];
                 
                 dtos.push(currDto);
@@ -69,7 +69,7 @@ export class ExchangeMap {
     static getDefaultSortParam(): SortParam[] {
         return [
             {
-                fieldName: 'exchangeFullName', // todo: what should be as a default?
+                fieldName: 'fullName', // todo: what should be as a default?
                 asc: false,
             },
         ];

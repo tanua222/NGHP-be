@@ -14,7 +14,7 @@ const router: express.Router = express.Router();
   --method GET \
   --timeout=0 \
   --header '' \
-   'http://localhost:3006/ivsHierarchy/v1/exchange?offset=0&sort=abbrev&filter=14&limit=10'
+   'http://localhost:3006/ivsHierarchy/v1/exchange?offset=0&sort=abbreviation&filter=14&limit=10'
 **/
 router.get('/', executeGet(ExchangeGetService, mapExchangeGetReqToRequestParam));
 /**
@@ -23,21 +23,21 @@ router.get('/', executeGet(ExchangeGetService, mapExchangeGetReqToRequestParam))
   --timeout=0 \
   --header 'Content-Type: application/json' \
   --body-data '{
-    "abbrev": "test-55",
-    "bookNum": "06",
+    "abbreviation": "test-55",
+    "bookNumber": "06",
     "createdTs": "2016-11-01T12:52:48.475Z",
     "createdUserId": "DATA_SETUP",
-    "exchangeFullName": "ZEBALLOS",
+    "fullName": "ZEBALLOS",
     "lastUpdatedTs": "2016-11-01T12:52:48.515Z",
     "lastUpdatedUserId": "DATA_SETUP",
-    "secondAbbrev": null,
-    "sectionNum": "20",
+    "secondAbbreviation": null,
+    "sectionNumber": "20",
     "npa": [
         {
-            "bnemNpa": "238"
+            "npa": "238"
         },
         {
-            "bnemNpa": "778"
+            "npa": "778"
         }
     ]
 }' \

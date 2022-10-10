@@ -5,9 +5,9 @@ const transformer = require('json-transformer-node');
 
 export default class ExchangeGetEntity extends BaseEntity {
   rn: number;
-  bnemNpa: string;
-  bnemNpaExchId: number;
-  @sortableString() bookNum: string;
+  npa: string;
+  id: number;
+  @sortableString() bookNumber: string;
   createTs: string;
   createUserId: string;
   @sortableString() exchAbbrev2: string;
@@ -16,15 +16,15 @@ export default class ExchangeGetEntity extends BaseEntity {
   lastUpdtTs: string;
   @sortableString() lastUpdtUserId: string;
   resultCount: number;
-  @sortableString() sectionNum: string;
+  @sortableString() sectionNumber: string;
 
   static transformer = {
     mapping: {
       item: {
         rn: 'RN',
-        bnemNpa: 'BNEM_NPA',
-        bnemNpaExchId: 'BNEM_NPA_EXCH_ID',
-        bookNum: 'BOOK_NUM',
+        npa: 'BNEM_NPA',
+        id: 'BNEM_NPA_EXCH_ID',
+        bookNumber: 'BOOK_NUM',
         createTs: 'CREATE_TS',
         createUserId: 'CREATE_USER_ID',
         exchAbbrev2: 'EXCH_ABBREV_2',
@@ -33,7 +33,7 @@ export default class ExchangeGetEntity extends BaseEntity {
         lastUpdtTs: 'LAST_UPDT_TS',
         lastUpdtUserId: 'LAST_UPDT_USER_ID',
         resultCount: 'RESULT_COUNT',
-        sectionNum: 'SECTION_NUM'
+        sectionNumber: 'SECTION_NUM'
       },
     },
   };
