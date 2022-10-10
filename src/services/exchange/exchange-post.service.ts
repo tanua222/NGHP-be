@@ -24,7 +24,7 @@ export default class ExchangePostService extends HaaBaseService<ExchangePostDao>
     const entity: ExchangePostEntity = ExchangePostMap.dtoToEntityForCreate(requestParam);
 
     for await (const npaItem of entity.npa) {
-      npaItem.bnemNpaExchId = await this.dao.getNpaExchId();
+      npaItem.id = await this.dao.getNpaExchId();
     }
 
     Object.assign(queryParam, entity);
@@ -60,14 +60,14 @@ export default class ExchangePostService extends HaaBaseService<ExchangePostDao>
     // params && (response.result = params);
     if (params) {
       response.result = {
-        abbrev: params.abbrev,
-        bookNum: params.bookNum,
+        abbreviation: params.abbreviation,
+        bookNumber: params.bookNumber,
         createdUserId: params.createdUserId,
-        exchangeFullName: params.exchangeFullName,
+        fullName: params.fullName,
         lastUpdatedUserId: params.lastUpdatedUserId,
         npa: params.npa,
-        secondAbbrev: params.secondAbbrev,
-        sectionNum: params.sectionNum
+        secondAbbreviation: params.secondAbbreviation,
+        sectionNumber: params.sectionNumber
       };
     }
 
@@ -86,15 +86,15 @@ export default class ExchangePostService extends HaaBaseService<ExchangePostDao>
     const npaSet = new Set();
 
     for (const item of npa) {
-      const bnemNpa = item.bnemNpa;
-      if (!bnemNpa) {
+      const npa = item.npa;
+      if (!npa) {
         errors.push(errorResponse(ErrorMapping.IVSHAA4404, this.context, { item }));
       }
-      npaSet.add(item.bnemNpa);
+      npaSet.add(item.npa);
     }
 
     if (npa.length !== npaSet.size) {
-      errors.push(errorResponse(ErrorMapping.IVSHAA4420, this.context, { npa, bnemNpas: Array.from(npaSet) }));
+      errors.push(errorResponse(ErrorMapping.IVSHAA4420, this.context, { npa, npas: Array.from(npaSet) }));
     }
 
     if (errors.length > 0) {

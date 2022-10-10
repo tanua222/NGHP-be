@@ -75,11 +75,11 @@
             VALUES
 
                 (
-                    #{abbrev},
-                    #{exchangeFullName},
-                    #{secondAbbrev},
-                    #{bookNum},
-                    #{sectionNum},
+                    #{abbreviation},
+                    #{fullName},
+                    #{secondAbbreviation},
+                    #{bookNumber},
+                    #{sectionNumber},
                     SYSDATE,
                     #{createdUserId},
                     SYSDATE,
@@ -105,9 +105,9 @@
 			)
 		VALUES
 			(
-				#{bnemNpaExchId},
-				#{bnemNpa},
-				#{abbrev},
+				#{id},
+				#{npa},
+				#{abbreviation},
 				SYSDATE,
 				#{createdUserId},
 				SYSDATE,

@@ -1,16 +1,16 @@
 import { BaseDto } from './haa-common.dto';
 
 export default class ExchangeDto extends BaseDto {
-    abbrev: string;
-    bookNum: string;
+    abbreviation: string;
+    bookNumber: string;
     createdUserId: string;
-    exchangeFullName: string;
+    fullName: string;
     lastUpdatedUserId: string;
     npa: NpaExchangePostDto[];
-    secondAbbrev: string;
-    sectionNum: string;
+    secondAbbreviation: string;
+    sectionNumber: string;
 }
 
 export class NpaExchangePostDto extends BaseDto {
-    bnemNpa: string;
+    npa: string;
 }

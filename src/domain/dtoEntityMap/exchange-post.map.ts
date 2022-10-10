@@ -6,20 +6,20 @@ export class ExchangePostMap {
     static dtoToEntityForCreate(requestParam: RequestParam): ExchangePostEntity {
         const entity: ExchangePostEntity = new ExchangePostEntity();
         const dto: ExchangePostDto = requestParam.inputRequest;
-        entity.abbrev = dto.abbrev.trim();
-        entity.exchangeFullName = dto.exchangeFullName.trim();
-        entity.bookNum = dto.bookNum;
-        entity.sectionNum = dto.sectionNum
+        entity.abbreviation = dto.abbreviation.trim();
+        entity.fullName = dto.fullName.trim();
+        entity.bookNumber = dto.bookNumber;
+        entity.sectionNumber = dto.sectionNumber
         entity.createdUserId = dto.createdUserId;
         entity.lastUpdatedUserId = dto.lastUpdatedUserId;
-        entity.secondAbbrev = dto.secondAbbrev;
+        entity.secondAbbreviation = dto.secondAbbreviation;
         // NpaExchangePostDto[] to NpaExchangePostEntity[]
         entity.npa = dto.npa.map((npaDto: NpaExchangePostDto) => {
             const npaEntity: NpaExchangePostEntity = new NpaExchangePostEntity();
-            npaEntity.bnemNpa = npaDto.bnemNpa;
-            npaEntity.abbrev = dto.abbrev;
+            npaEntity.npa = npaDto.npa;
+            npaEntity.abbreviation = dto.abbreviation;
             npaEntity.createdUserId = dto.createdUserId;
-            npaEntity.exchangeFullName = dto.exchangeFullName;
+            npaEntity.fullName = dto.fullName;
             npaEntity.lastUpdatedUserId = dto.lastUpdatedUserId;
 
             return npaEntity

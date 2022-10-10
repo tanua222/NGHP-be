@@ -5,27 +5,27 @@ import BaseEntity from './base.entity';
 const transformer = require('json-transformer-node');
 
 export default class ExchangePostEntity extends BaseEntity {
-  abbrev: string;
-  bookNum: string;
+  abbreviation: string;
+  bookNumber: string;
   createdUserId: string;
-  secondAbbrev: string;
-  exchangeFullName: string;
+  secondAbbreviation: string;
+  fullName: string;
   lastUpdatedUserId: string;
-  sectionNum: string;
+  sectionNumber: string;
   npa: NpaExchangePostEntity[];
 
   static transformer = {
     mapping: {
       item: {
-        // bnemNpa: 'BNEM_NPA',
-        // bnemNpaExchId: 'BNEM_NPA_EXCH_ID',
-        abbrev: 'EXCH_ABBREV',
-        bookNum: 'BOOK_NUM',
+        // npa: 'BNEM_NPA',
+        // id: 'BNEM_NPA_EXCH_ID',
+        abbreviation: 'EXCH_ABBREV',
+        bookNumber: 'BOOK_NUM',
         createdUserId: 'CREATE_USER_ID',
-        secondAbbrev: 'EXCH_ABBREV_2',
-        exchangeFullName: 'EXCH_FULL_NAME',
+        secondAbbreviation: 'EXCH_ABBREV_2',
+        fullName: 'EXCH_FULL_NAME',
         lastUpdatedUserId: 'LAST_UPDT_USER_ID',
-        sectionNum: 'SECTION_NUM'
+        sectionNumber: 'SECTION_NUM'
       },
     },
   };
@@ -61,11 +61,11 @@ export default class ExchangePostEntity extends BaseEntity {
 }
 
 export class NpaExchangePostEntity extends BaseEntity {
-  bnemNpaExchId?: number;
-  bnemNpa: string;
+  id?: number;
+  npa: string;
   // data from Exchange entity
-  abbrev: string;
+  abbreviation: string;
   createdUserId: string;
-  exchangeFullName: string;
+  fullName: string;
   lastUpdatedUserId: string;
 }
