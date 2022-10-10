@@ -6,10 +6,7 @@
     SELECT
         RESULT_COUNT, 
         CLEC_FILENAME, 
-        EDI_FILENAME,
         DT_DOWNLOADED_PST_FMT,
-        NAME,
-        CLEC_PROV,
         NEW,
         AWAITING_PRECHECK,
         AWAITING_BLIF_TO_DIRECTION,
@@ -36,12 +33,9 @@
                         (
                             SELECT
                                 blif_file.clec_filename,
-                                blif_file.edi_filename,
                                 blif_file.dt_downloaded,
                                 to_char(from_tz(CAST(blif_file.dt_downloaded AS TIMESTAMP), dbtimezone) AT TIME ZONE to_char('${webTZ}'),
                                         'yyyy-mm-dd HH24:MI:SS')                                     AS dt_downloaded_pst_fmt,
-                                blif_spid.name,
-                                blif_file.clec_prov,
                                 SUM(decode(blif_listings.internal_status, '0000', 1, 0)) AS new,
                                 SUM(
                                     CASE blif_listings.internal_status
@@ -68,10 +62,7 @@
         AND telus_ind = '${telusInd}'
     GROUP BY
         clec_filename,
-        edi_filename,
-        dt_downloaded,
-        blif_spid.name,
-        blif_file.clec_prov
+        dt_downloaded
                         ) y
     WHERE
         ( y.new + y.awaiting_precheck + y.awaiting_blif_to_direction + y.locked_by_automation + y.failed_blif_to_direction + y.awaiting_ack_accepted +

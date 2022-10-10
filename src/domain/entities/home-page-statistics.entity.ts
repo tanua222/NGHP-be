@@ -5,13 +5,12 @@ const transformer = require('json-transformer-node');
 
 export default class HomePageStatisticsEntity extends BaseEntity {
   resultCount: number;
-  @sortableString() clecFilename: string;
-  @sortableString() ediFilename: string;
+  @sortableString() file: string;
   dtDownloadedPstFmt: string;
   @sortableString() name: string;
   @sortableString() clecProv: string;
   new: number;
-  awaitingPrecheck: number;
+  awaitingPreCheck: number;
   awaitingBlifToDirection: number;
   lockedByAutomation: number;
   failedBlifToDirection: number;
@@ -24,13 +23,11 @@ export default class HomePageStatisticsEntity extends BaseEntity {
     mapping: {
       item: {
         resultCount: 'RESULT_COUNT',
-        clecFilename: 'CLEC_FILENAME',
-        ediFilename: 'EDI_FILENAME',
+        file: 'CLEC_FILENAME',
         dtDownloadedPstFmt: 'DT_DOWNLOADED_PST_FMT',
-        name: 'NAME',
         clecProv: 'CLEC_PROV',
         new: 'NEW',
-        awaitingPrecheck: 'AWAITING_PRECHECK',
+        awaitingPreCheck: 'AWAITING_PRECHECK',
         awaitingBlifToDirection: 'AWAITING_BLIF_TO_DIRECTION',
         lockedByAutomation: 'LOCKED_BY_AUTOMATION',
         failedBlifToDirection: 'FAILED_BLIF_TO_DIRECTION',

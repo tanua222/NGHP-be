@@ -5,13 +5,10 @@ import { SortParam } from '../dto/haa-common.dto';
 export class HomePageStatisticsMap {
 
     static dtoFieldToEntityFieldMapping: any = {
-        clecFilename: 'clecFilename',
-        ediFilename: 'ediFilename',
-        dateDownloadedFormattted: 'dtDownloadedPstFmt',
-        clec: 'name',
-        province: 'clecProv',
+        file: 'file',
+        dateDownloaded: 'dtDownloadedPstFmt',
         newFile: 'new',
-        awaitingPrecheck: 'awaitingPrecheck',
+        awaitingPreCheck: 'awaitingPreCheck',
         awaitingBlifToDirection: 'awaitingBlifToDirection',
         lockedByAutomation: 'lockedByAutomation',
         failedBlifToDirection: 'failedBlifToDirection',
@@ -26,13 +23,10 @@ export class HomePageStatisticsMap {
         const dtos = entities.map((entity) => {
             const dto = new HomePageStatisticsDto();
             dto.totalFilteredRows = entity.resultCount;
-            dto.clecFilename = entity.clecFilename;
-            dto.ediFilename = entity.ediFilename;
-            dto.dateDownloadedFormattted = entity.dtDownloadedPstFmt;
-            dto.clec = entity.name;
-            dto.province = entity.clecProv;
+            dto.file = entity.file;
+            dto.dateDownloaded = entity.dtDownloadedPstFmt;
             dto.newFile = entity.new;
-            dto.awaitingPrecheck = entity.awaitingPrecheck;
+            dto.awaitingPreCheck = entity.awaitingPreCheck;
             dto.awaitingBlifToDirection = entity.awaitingBlifToDirection;
             dto.lockedByAutomation = entity.lockedByAutomation;
             dto.failedBlifToDirection = entity.failedBlifToDirection;
@@ -62,7 +56,7 @@ export class HomePageStatisticsMap {
     static getDefaultSortParam(): SortParam[] {
         return [
             {
-                fieldName: 'dateDownloadedFormattted',
+                fieldName: 'dateDownloaded',
                 asc: false,
             },
         ];
