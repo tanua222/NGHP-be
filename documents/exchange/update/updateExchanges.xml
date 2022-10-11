@@ -1,0 +1,101 @@
+POST
+/exchange/update
+
+updateExchanges(Exchange[]);
+
+[
+    {
+        "abbreviation": "test-50",
+        "bookNumber": "06",
+        "createdTs": "2022-10-07T22:18:37.000Z",
+        "createdUserId": "DATA_SETUP",
+        "fullName": "ZEBALLOS",
+        "lastUpdatedTs": "2022-10-07T22:18:37.000Z",
+        "lastUpdatedUserId": "DATA_SETUP",
+        "secondAbbreviation": null,
+        "sectionNumber": "20",
+        "npa": [
+            {
+                "npa": "238",
+                "id": 1909
+            }
+        ]
+    }
+]
+=======================================================
+    /**
+     * Updates a <code>List<Exchange></code>
+     * 
+     * @param <code>List<Exchange></code>
+     * @return <code>true</code> if all the updates were successful. <code>false</code> otherwise
+     */
+    public boolean updateExchanges(List<Exchange> exchanges)
+    {
+        try
+        {
+            LOGGER.debug( "Entering updateExchanges method" );
+            for ( Exchange exchange : exchanges ) //DONE
+            {
+                exchangeMapper.updateExchange( exchange );
+                
+                List<NpaExchange> npaeList =  npaExchangeMapper.getByExchange(exchange);
+                if (StringUtils.isEmpty(exchange.getNpa())) {
+                	if (null != npaeList && npaeList.size() > 0) {
+                		npaExchangeMapper.deleteByAbbrev(exchange);
+                	}
+                } else {
+                	String[] npas = StringUtils.deleteWhitespace(exchange.getNpa()).split(",");
+                	// ADD new NPAs
+                	for(String npa: npas) {
+                		boolean exists = false;
+                		if (null != npaeList && npaeList.size() > 0) {
+                    		for (NpaExchange npae : npaeList) {
+								if (npa.equalsIgnoreCase(npae.getNpa())) {
+									exists = true;
+									break;
+								}
+							}
+                    	}
+                		if (!exists && npaExchangeMapper.npaExists(npa) > 0) {
+                			NpaExchange npae = new NpaExchange();
+                			npae.setNpa(npa);
+                			npae.setExchAbbrev(exchange.getAbbrev());
+                			npae.setCreatedUserId(exchange.getLastUpdatedUserId());
+                			npae.setLastUpdatedUserId(exchange.getLastUpdatedUserId());
+                			npaExchangeMapper.insert(npae);
+                			LOGGER.debug("Added new NPA: " + npae);
+                		}
+                	}
+                	// DELETE missing NPAs
+                    if ( npaeList != null )
+                    {
+                        for ( NpaExchange npae : npaeList )
+                        {
+                            boolean exists = false;
+                            for ( String npa : npas )
+                            {
+                                if ( npa.equalsIgnoreCase( npae.getNpa() ) )
+                                {
+                                    exists = true;
+                                }
+                            }
+                            if ( !exists )
+                            {
+                                npaExchangeMapper.deleteByNpaExchange( npae );
+                            }
+                        }
+                    }
+                }
+                
+            }
+        }
+        catch ( Exception e )
+        {
+        	e.printStackTrace();
+            String errMsg = "Error with updating exchanges";
+            LOGGER.error( errMsg, e );
+            return false;
+        }
+        
+        return true;
+    }

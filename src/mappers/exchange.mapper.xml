@@ -87,6 +87,33 @@
                 )
     </insert>
 
+    <update id="updateExchange">
+		UPDATE BLIF_EXCH_MTNC
+		<set>
+			<if test="fullName != null">EXCH_FULL_NAME = #{fullName},</if>
+			<if test="secondAbbreviation != null">EXCH_ABBREV_2 = #{secondAbbreviation},</if>
+			<if test="bookNumber != null"> BOOK_NUM = #{bookNumber},</if>
+			<if test="sectionNumber != null"> SECTION_NUM = #{sectionNumber},</if>
+			LAST_UPDT_TS = SYSDATE,
+			LAST_UPDT_USER_ID = #{lastUpdatedUserId}
+		</set>
+		
+		<where> 
+			EXCH_ABBREV LIKE #{abbreviation}
+		</where>
+
+	</update>    
+
+    <!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+    <!--! NPA Exchange queries section !-->
+    <!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+
+    <select id="getNpaByExchange">
+		SELECT *
+		  FROM BLIF_NPA_EXCH_MTNC
+		 WHERE EXCH_ABBREV = #{abbreviation}
+	</select>
+    
     <select id="getNpaExchId">
           SELECT 
           BLIF_NPA_EXCH_MTNC_SEQ.nextVal as BNEM_NPA_EXCH_ID

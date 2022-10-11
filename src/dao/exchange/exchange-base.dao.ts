@@ -17,6 +17,10 @@ export default class ExchangeBaseDao extends HaaBaseDao {
     return ExchangeGetEntity.transform(results);
   }
 
+  // mapDbResultToEntity(results: any): NpaExchangeGetEntity[] {
+  //   return NpaExchangeGetEntity.transform(results);
+  // }
+
   mapEntityParamsToDbColumns(sortParams: SortParam[]): string[] {
     const sortConditions = sortParams
       ?.filter((s1: any) => ExchangeGetEntity.getDbColumnName(s1.fieldName))
@@ -29,6 +33,6 @@ export default class ExchangeBaseDao extends HaaBaseDao {
   async validateAndExecuteTask(mapperId: string, params: any, conn?: IvsConnection,) {
     if (!conn) throw Error.noDbConnection(this.dbConfig.poolAlias, mapperId);
 
-    return await this.executeTask(mapperId, conn, params);
+    return await this.executeTask(mapperId, conn, { ...params, options: { autoCommit: false } });
   }
 }

@@ -4,6 +4,7 @@ import {
 } from '../middleware/haa/haa-req-mapper';
 import ExchangeAddService from '../services/exchange/exchange-add.service';
 import ExchangeGetService from '../services/exchange/exchange-get.service';
+import ExchangeUpdateService from '../services/exchange/exchange-update.service';
 
 
 import { executeGet, executePostTask } from '../utils/execute';
@@ -46,5 +47,7 @@ router.get('/', executeGet(ExchangeGetService, mapExchangeGetReqToRequestParam))
    'http://localhost:3006/ivsHierarchy/v1/exchange'
  */
 router.post('/', executePostTask(ExchangeAddService));
+
+router.post('/update', executePostTask(ExchangeUpdateService));
 
 export default router;
