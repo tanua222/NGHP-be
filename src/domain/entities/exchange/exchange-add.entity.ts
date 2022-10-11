@@ -1,5 +1,3 @@
-import { sortableString } from '../../../utils/util';
-import { BaseDto } from '../../dto/haa-common.dto';
 import ResponseDto from '../../dto/response.dto';
 import BaseEntity from '../base.entity';
 const transformer = require('json-transformer-node');
@@ -17,8 +15,6 @@ export default class ExchangeAddEntity extends BaseEntity {
   static transformer = {
     mapping: {
       item: {
-        // npa: 'BNEM_NPA',
-        // id: 'BNEM_NPA_EXCH_ID',
         abbreviation: 'EXCH_ABBREV',
         bookNumber: 'BOOK_NUM',
         createdUserId: 'CREATE_USER_ID',
@@ -56,8 +52,6 @@ export default class ExchangeAddEntity extends BaseEntity {
     const index = Object.keys(ExchangeAddEntity.transformer.mapping.item).findIndex((n1) => n1 == columnName);
     return index > -1 ? Object.values(ExchangeAddEntity.transformer.mapping.item)[index] : undefined;
   }
-
-
 }
 
 export class NpaExchangeAddEntity extends BaseEntity {

@@ -1,6 +1,7 @@
 import { Language } from '../../utils/constants';
 import { PaginationParam, SortParam } from '../dto/haa-common.dto';
 import BaseEntity from './base.entity';
+import ExchangeUpdateEntity from './exchange/exchange-update.entity';
 
 export default class HaaQueryParams {
   corporationId?: number;
@@ -142,12 +143,12 @@ export class ExchangeAddQueryParam extends HaaQueryParams {
   fullName: string;
   lastUpdatedTs: string;
   lastUpdatedUserId: string;
-  npa: NpaExchangeQueryParam[];
+  npa: NpaExchangeAddQueryParam[];
   secondAbbreviation: string;
   sectionNumber: string;
 }
 
-export class NpaExchangeQueryParam {
+export class NpaExchangeAddQueryParam {
   id: number;
   npa: string;
   // data from Exchange entity
@@ -155,3 +156,29 @@ export class NpaExchangeQueryParam {
   createdUserId: string;
   lastUpdatedUserId: string;
 }
+
+export class ExchangeUpdateQueryParam extends HaaQueryParams {
+  entities: ExchangeUpdateEntity[];
+}
+
+// export class ExchangeUpdateQueryParam extends HaaQueryParams {
+//   abbreviation: string;
+//   bookNumber: string;
+//   createdTs: string;
+//   createdUserId: string;
+//   fullName: string;
+//   lastUpdatedTs: string;
+//   lastUpdatedUserId: string;
+//   npa: NpaExchangeAddQueryParam[];
+//   secondAbbreviation: string;
+//   sectionNumber: string;
+// }
+
+// export class NpaExchangeUpdateQueryParam {
+//   id: number;
+//   npa: string;
+//   // data from Exchange entity
+//   abbreviation: string;
+//   createdUserId: string;
+//   lastUpdatedUserId: string;
+// }
