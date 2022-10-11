@@ -2,8 +2,10 @@ import express from 'express';
 import {
   mapExchangeGetReqToRequestParam
 } from '../middleware/haa/haa-req-mapper';
+import ExchangeAddService from '../services/exchange/exchange-add.service';
 import ExchangeGetService from '../services/exchange/exchange-get.service';
-import ExchangePostService from '../services/exchange/exchange-post.service';
+
+
 import { executeGet, executePostTask } from '../utils/execute';
 
 const router: express.Router = express.Router();
@@ -43,6 +45,6 @@ router.get('/', executeGet(ExchangeGetService, mapExchangeGetReqToRequestParam))
 }' \
    'http://localhost:3006/ivsHierarchy/v1/exchange'
  */
-router.post('/', executePostTask(ExchangePostService));
+router.post('/', executePostTask(ExchangeAddService));
 
 export default router;

@@ -1,6 +1,6 @@
-import { sortableString } from '../../utils/util';
-import ResponseDto from '../dto/response.dto';
-import BaseEntity from './base.entity';
+import { sortableString } from '../../../utils/util';
+import ResponseDto from '../../dto/response.dto';
+import BaseEntity from './../base.entity';
 const transformer = require('json-transformer-node');
 
 export default class ExchangeGetEntity extends BaseEntity {

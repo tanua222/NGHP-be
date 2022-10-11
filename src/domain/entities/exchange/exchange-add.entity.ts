@@ -1,10 +1,10 @@
-import { sortableString } from '../../utils/util';
-import { BaseDto } from '../dto/haa-common.dto';
-import ResponseDto from '../dto/response.dto';
-import BaseEntity from './base.entity';
+import { sortableString } from '../../../utils/util';
+import { BaseDto } from '../../dto/haa-common.dto';
+import ResponseDto from '../../dto/response.dto';
+import BaseEntity from '../base.entity';
 const transformer = require('json-transformer-node');
 
-export default class ExchangePostEntity extends BaseEntity {
+export default class ExchangeAddEntity extends BaseEntity {
   abbreviation: string;
   bookNumber: string;
   createdUserId: string;
@@ -12,7 +12,7 @@ export default class ExchangePostEntity extends BaseEntity {
   fullName: string;
   lastUpdatedUserId: string;
   sectionNumber: string;
-  npa: NpaExchangePostEntity[];
+  npa: NpaExchangeAddEntity[];
 
   static transformer = {
     mapping: {
@@ -36,7 +36,7 @@ export default class ExchangePostEntity extends BaseEntity {
         result: [
           {
             list: 'data',
-            item: ExchangePostEntity.transformer.mapping.item,
+            item: ExchangeAddEntity.transformer.mapping.item,
           },
         ],
       },
@@ -44,23 +44,23 @@ export default class ExchangePostEntity extends BaseEntity {
   };
 
   // todo move to helper
-  static transform(json: any): ExchangePostEntity[] {
+  static transform(json: any): ExchangeAddEntity[] {
     if (Array.isArray(json)) {
-      return transformer.transform({ data: json }, ExchangePostEntity.transformerArray).result;
+      return transformer.transform({ data: json }, ExchangeAddEntity.transformerArray).result;
     }
     throw ResponseDto.internalError('Array is expected');
   }
 
   // todo move to helper
   static getDbColumnName(columnName: string): any {
-    const index = Object.keys(ExchangePostEntity.transformer.mapping.item).findIndex((n1) => n1 == columnName);
-    return index > -1 ? Object.values(ExchangePostEntity.transformer.mapping.item)[index] : undefined;
+    const index = Object.keys(ExchangeAddEntity.transformer.mapping.item).findIndex((n1) => n1 == columnName);
+    return index > -1 ? Object.values(ExchangeAddEntity.transformer.mapping.item)[index] : undefined;
   }
 
 
 }
 
-export class NpaExchangePostEntity extends BaseEntity {
+export class NpaExchangeAddEntity extends BaseEntity {
   id?: number;
   npa: string;
   // data from Exchange entity

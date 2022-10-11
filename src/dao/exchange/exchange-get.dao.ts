@@ -1,7 +1,7 @@
-import { SortParam } from '../domain/dto/haa-common.dto';
-import ExchangeGetEntity from '../domain/entities/exchange-get.entity';
-import { BaseDaoOptions } from './base.dao';
-import HaaBaseDao from './haa-base.dao';
+import { SortParam } from '../../domain/dto/haa-common.dto';
+import ExchangeGetEntity from '../../domain/entities/exchange/exchange-get.entity';
+import { BaseDaoOptions } from './../base.dao';
+import HaaBaseDao from './../haa-base.dao';
 
 export default class ExchangeGetDao extends HaaBaseDao {
   constructor(options: BaseDaoOptions) {

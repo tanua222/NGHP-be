@@ -1,9 +1,9 @@
-import ExchangePostDao from '../../dao/exchange-post.dao';
-import ExchangeGetDto from '../../domain/dto/exchange-get.dto';
+import ExchangeAddDao from '../../dao/exchange/exchange-add.dao';
+import ExchangeGetDto from '../../domain/dto/exchange/exchange-get.dto';
 import { HaaBaseDto, RequestParam } from '../../domain/dto/haa-common.dto';
 import ResponseDto, { Error } from '../../domain/dto/response.dto';
-import { ExchangePostMap } from '../../domain/dtoEntityMap/exchange-post.map';
-import ExchangePostEntity from '../../domain/entities/exchange-post.entity';
+import { ExchangeAddMap } from '../../domain/dtoEntityMap/exchange/exchange-add.map';
+import ExchangeAddEntity from '../../domain/entities/exchange/exchange-add.entity';
 import { ExchangeAddQueryParam } from '../../domain/entities/haa-query-param.entity';
 import { errorResponse } from '../../error/error-responses';
 import { ErrorMapping } from '../../error/error-responses-mapping';
@@ -12,16 +12,16 @@ import Context from '../../utils/context';
 import { IvsConnection } from '../../utils/database';
 import HaaBaseService from '../haa-base.service';
 
-export default class ExchangePostService extends HaaBaseService<ExchangePostDao> {
+export default class ExchangeAddService extends HaaBaseService<ExchangeAddDao> {
   constructor(context: Context) {
-    super({ context, dao: new ExchangePostDao({ context }) });
+    super({ context, dao: new ExchangeAddDao({ context }) });
   }
 
   async mapToEntityQueryParams(requestParam: RequestParam): Promise<ExchangeAddQueryParam> {
     const queryParam: ExchangeAddQueryParam = <ExchangeAddQueryParam>(
       this.mapToEntityQueryParamsCommon(requestParam)
     );
-    const entity: ExchangePostEntity = ExchangePostMap.dtoToEntityForCreate(requestParam);
+    const entity: ExchangeAddEntity = ExchangeAddMap.dtoToEntityForCreate(requestParam);
 
     for await (const npaItem of entity.npa) {
       npaItem.id = await this.dao.getNpaExchId();
@@ -112,7 +112,7 @@ export default class ExchangePostService extends HaaBaseService<ExchangePostDao>
 
   async executeTask(args: any): Promise<ResponseDto<any>> {
     this.conn = await IvsConnection.getConnection(this.dao.dbConfig, this.context);
-    this.log.debug('ExchangePostService.executeTask connection retrieved: ', this.conn);
+    this.log.debug('ExchangeAddService.executeTask connection retrieved: ', this.conn);
     try {
       let params = args.params;
 
@@ -141,7 +141,7 @@ export default class ExchangePostService extends HaaBaseService<ExchangePostDao>
 
       return this.getResponse(params);
     } catch (error) {
-      this.log.error('ExchangePostService.executeTask error occured:', error);
+      this.log.error('ExchangeAddService.executeTask error occured:', error);
       await this.conn.rollback();
 
       if ((<any>error).errorNum === 20109) {
@@ -156,10 +156,10 @@ export default class ExchangePostService extends HaaBaseService<ExchangePostDao>
       if (this.conn) {
         try {
           this.conn.close();
-          this.log.debug('ExchangePostService.executeTask connection closed');
+          this.log.debug('ExchangeAddService.executeTask connection closed');
           this.conn = undefined;
         } catch (err) {
-          this.log.error('ExchangePostService.executeTask finally with error!', err);
+          this.log.error('ExchangeAddService.executeTask finally with error!', err);
         }
       }
     }

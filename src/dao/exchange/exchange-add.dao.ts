@@ -1,11 +1,11 @@
-import { SortParam } from '../domain/dto/haa-common.dto';
-import { Error } from '../domain/dto/response.dto';
-import ExchangeGetEntity from '../domain/entities/exchange-get.entity';
-import { IvsConnection } from '../utils/database';
-import { BaseDaoOptions } from './base.dao';
-import HaaBaseDao from './haa-base.dao';
+import { SortParam } from '../../domain/dto/haa-common.dto';
+import { Error } from '../../domain/dto/response.dto';
+import ExchangeGetEntity from '../../domain/entities/exchange/exchange-get.entity';
+import { IvsConnection } from '../../utils/database';
+import { BaseDaoOptions } from '../base.dao';
+import HaaBaseDao from '../haa-base.dao';
 
-export default class ExchangePostDao extends HaaBaseDao {
+export default class ExchangeAddDao extends HaaBaseDao {
   constructor(options: BaseDaoOptions) {
     super({
       mapperNamespace: 'exchangeMapper',

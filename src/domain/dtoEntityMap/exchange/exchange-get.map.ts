@@ -1,7 +1,7 @@
-import { isNullOrUndefined } from '../../utils/util';
-import ExchangeGetDto, { NpaExchangeGetDto } from '../dto/exchange-get.dto';
-import { SortParam } from '../dto/haa-common.dto';
-import ExchangeGetEntity from '../entities/exchange-get.entity';
+import { isNullOrUndefined } from '../../../utils/util';
+import ExchangeGetDto, { NpaExchangeGetDto } from '../../dto/exchange/exchange-get.dto';
+import { SortParam } from '../../dto/haa-common.dto';
+import ExchangeGetEntity from '../../entities/exchange/exchange-get.entity';
 
 export class ExchangeMap {
     static dtoFieldToEntityFieldMapping: any = {

@@ -1,8 +1,8 @@
-import ExchangeGetDao from '../../dao/exchange-get.dao';
+import ExchangeGetDao from '../../dao/exchange/exchange-get.dao';
 import { RequestParam, SortParam } from '../../domain/dto/haa-common.dto';
-import { ExchangeMap } from '../../domain/dtoEntityMap/exchange-get.map';
+import { ExchangeMap } from '../../domain/dtoEntityMap/exchange/exchange-get.map';
 import HaaQueryParams, { ExchangeGetQueryParam } from '../../domain/entities/haa-query-param.entity';
-import ExchangeGetEntity from '../../domain/entities/exchange-get.entity';
+import ExchangeGetEntity from '../../domain/entities/exchange/exchange-get.entity';
 import Context from '../../utils/context';
 import HaaBaseGetService from '../haa-base-get.service';
 import { ExchangeRequestParam } from '../../domain/dto/haa-common.dto';

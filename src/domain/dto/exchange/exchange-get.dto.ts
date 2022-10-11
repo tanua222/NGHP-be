@@ -1,4 +1,4 @@
-import { BaseDto } from './haa-common.dto';
+import { BaseDto } from '../haa-common.dto';
 
 export default class ExchangeGetDto extends BaseDto {
     abbreviation: string;

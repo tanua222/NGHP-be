@@ -1,11 +1,11 @@
-import ExchangePostDto, { NpaExchangePostDto } from '../dto/exchange-post.dto';
-import { RequestParam } from '../dto/haa-common.dto';
-import ExchangePostEntity, { NpaExchangePostEntity } from '../entities/exchange-post.entity';
+import ExchangeAddDto, { NpaExchangeAddDto } from '../../dto/exchange/exchange-add.dto';
+import { RequestParam } from '../../dto/haa-common.dto';
+import ExchangeAddEntity, { NpaExchangeAddEntity } from '../../entities/exchange/exchange-add.entity';
 
-export class ExchangePostMap {
-    static dtoToEntityForCreate(requestParam: RequestParam): ExchangePostEntity {
-        const entity: ExchangePostEntity = new ExchangePostEntity();
-        const dto: ExchangePostDto = requestParam.inputRequest;
+export class ExchangeAddMap {
+    static dtoToEntityForCreate(requestParam: RequestParam): ExchangeAddEntity {
+        const entity: ExchangeAddEntity = new ExchangeAddEntity();
+        const dto: ExchangeAddDto = requestParam.inputRequest;
         entity.abbreviation = dto.abbreviation.trim();
         entity.fullName = dto.fullName.trim();
         entity.bookNumber = dto.bookNumber;
@@ -13,9 +13,9 @@ export class ExchangePostMap {
         entity.createdUserId = dto.createdUserId;
         entity.lastUpdatedUserId = dto.lastUpdatedUserId;
         entity.secondAbbreviation = dto.secondAbbreviation;
-        // NpaExchangePostDto[] to NpaExchangePostEntity[]
-        entity.npa = dto.npa.map((npaDto: NpaExchangePostDto) => {
-            const npaEntity: NpaExchangePostEntity = new NpaExchangePostEntity();
+        // NpaExchangeAddDto[] to NpaExchangeAddEntity[]
+        entity.npa = dto.npa.map((npaDto: NpaExchangeAddDto) => {
+            const npaEntity: NpaExchangeAddEntity = new NpaExchangeAddEntity();
             npaEntity.npa = npaDto.npa;
             npaEntity.abbreviation = dto.abbreviation;
             npaEntity.createdUserId = dto.createdUserId;
