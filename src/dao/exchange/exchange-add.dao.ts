@@ -1,3 +1,4 @@
+import { ExchangeDBErrorMapping } from '../../error/database/features/exchange-db-error-mapping';
 import { IvsConnection } from '../../utils/database';
 import { BaseDaoOptions } from '../base.dao';
 import ExchangeBaseDao from './exchange-base.dao';
@@ -7,6 +8,7 @@ export default class ExchangeAddDao extends ExchangeBaseDao {
     super({
       ...options,
     });
+    this.dbErrorMap = ExchangeDBErrorMapping;
   }
 
   async addExchange(params: any, conn?: IvsConnection) {
@@ -26,6 +28,10 @@ export default class ExchangeAddDao extends ExchangeBaseDao {
 
   async countNpa(params: any, conn?: IvsConnection) {
     const dbResult = await this.validateAndExecuteTask('countNpa', { params }, conn);
+    return dbResult.rows[0];
+  }
+  async npaExists(params: any, conn?: IvsConnection) {
+    const dbResult = await this.validateAndExecuteTask('npaExists', { params }, conn);
     return dbResult.rows[0];
   }
 }

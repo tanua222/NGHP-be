@@ -32,5 +32,25 @@ boolean addExchange(Exchange newExchange);
 			)
 </insert>
 
-1. We don't have NPA fields. should we add them?
-2. 
+
+    <insert id="addNpaExchange">
+      INSERT INTO BLIF_NPA_EXCH_MTNC (
+				NPA_EXCH_ID, 
+				NPA, 
+				EXCH_ABBREV,
+				CREATE_TS,
+				CREATE_USER_ID,
+				LAST_UPDT_TS,
+				LAST_UPDT_USER_ID
+			)
+		VALUES
+			(
+				#{id},
+				#{npa},
+				#{abbreviation},
+				SYSDATE,
+				#{createdUserId},
+				SYSDATE,
+				#{lastUpdatedUserId}
+			)
+	</insert>

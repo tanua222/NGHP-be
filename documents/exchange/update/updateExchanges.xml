@@ -38,9 +38,13 @@ updateExchanges(Exchange[]);
             {
                 exchangeMapper.updateExchange( exchange );
                 
-                List<NpaExchange> npaeList =  npaExchangeMapper.getByExchange(exchange);
+                List<NpaExchange> npaList =  npaExchangeMapper.getByExchange(exchange);
+
+                // move to method deleteNpaByAbbrev
+                // add comment why
+            
                 if (StringUtils.isEmpty(exchange.getNpa())) {
-                	if (null != npaeList && npaeList.size() > 0) {
+                	if (null != npaList && npaList.size() > 0) {
                 		npaExchangeMapper.deleteByAbbrev(exchange);
                 	}
                 } else {
@@ -48,40 +52,40 @@ updateExchanges(Exchange[]);
                 	// ADD new NPAs
                 	for(String npa: npas) {
                 		boolean exists = false;
-                		if (null != npaeList && npaeList.size() > 0) {
-                    		for (NpaExchange npae : npaeList) {
-								if (npa.equalsIgnoreCase(npae.getNpa())) {
+                		if (null != npaList && npaList.size() > 0) {
+                    		for (NpaExchange npaExchange : npaList) {
+                                    // you shouldn't update the current NPA because actually nothing changed
+                                    // all three main columns (id, npa, abbrev) are the same
+								if (npa.equalsIgnoreCase(npaExchange.getNpa())) {
 									exists = true;
 									break;
 								}
 							}
                     	}
                 		if (!exists && npaExchangeMapper.npaExists(npa) > 0) {
-                			NpaExchange npae = new NpaExchange();
-                			npae.setNpa(npa);
-                			npae.setExchAbbrev(exchange.getAbbrev());
-                			npae.setCreatedUserId(exchange.getLastUpdatedUserId());
-                			npae.setLastUpdatedUserId(exchange.getLastUpdatedUserId());
-                			npaExchangeMapper.insert(npae);
-                			LOGGER.debug("Added new NPA: " + npae);
+                			NpaExchange npaExchange = new NpaExchange();
+                			npaExchange.setNpa(npa);
+                			npaExchange.setExchAbbrev(exchange.getAbbrev());
+                			npaExchange.setCreatedUserId(exchange.getLastUpdatedUserId());
+                			npaExchange.setLastUpdatedUserId(exchange.getLastUpdatedUserId());
+                			npaExchangeMapper.insert(npaExchange);
+                			LOGGER.debug("Added new NPA: " + npaExchange);
                 		}
                 	}
                 	// DELETE missing NPAs
-                    if ( npaeList != null )
-                    {
-                        for ( NpaExchange npae : npaeList )
-                        {
+                    // move to function deteteMissingNpa
+                    // add comment for what
+                    if (npaList != null) {
+                        for ( NpaExchange npaExchange : npaList ) {
                             boolean exists = false;
-                            for ( String npa : npas )
-                            {
-                                if ( npa.equalsIgnoreCase( npae.getNpa() ) )
-                                {
+                            for (String npa : npas){
+                                if (npa.equalsIgnoreCase(npaExchange.getNpa())){
                                     exists = true;
                                 }
                             }
                             if ( !exists )
                             {
-                                npaExchangeMapper.deleteByNpaExchange( npae );
+                                npaExchangeMapper.deleteByNpaExchange( npaExchange );
                             }
                         }
                     }

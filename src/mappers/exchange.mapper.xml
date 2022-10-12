@@ -108,6 +108,17 @@
     <!--! NPA Exchange queries section !-->
     <!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
 
+    <delete id="deleteByNpaExchange">
+		DELETE FROM BLIF_NPA_EXCH_MTNC
+		WHERE NPA_EXCH_ID = #{npaExchangeId}
+	</delete>
+
+    
+    <delete id="deleteByAbbreviation">
+		DELETE FROM BLIF_NPA_EXCH_MTNC
+		WHERE EXCH_ABBREV = #{abbreviation}
+	</delete>
+
     <select id="getNpaByExchange">
 		SELECT *
 		  FROM BLIF_NPA_EXCH_MTNC
@@ -141,6 +152,12 @@
 				#{lastUpdatedUserId}
 			)
 	</insert>
+
+    <select id="npaExists">
+		SELECT COUNT(1)
+		FROM blif_npa_mtnc
+		WHERE npa = #{npa}
+	</select>
 
     <select id="countNpa">
         SELECT COUNT(*) AS COUNTER 

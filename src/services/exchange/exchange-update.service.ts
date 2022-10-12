@@ -1,8 +1,10 @@
+import e from 'express';
 import ExchangeUpdateDao from '../../dao/exchange/exchange-update.dao';
 import ExchangeGetDto from '../../domain/dto/exchange/exchange-get.dto';
 import { HaaBaseDto, RequestParam } from '../../domain/dto/haa-common.dto';
 import ResponseDto from '../../domain/dto/response.dto';
 import { ExchangeUpdateMap } from '../../domain/dtoEntityMap/exchange/exchange-update.map';
+import { NpaExchangeAddEntity } from '../../domain/entities/exchange/exchange-add.entity';
 import { NpaExchangeGetEntity } from '../../domain/entities/exchange/exchange-get.entity';
 import ExchangeUpdateEntity from '../../domain/entities/exchange/exchange-update.entity';
 import { ExchangeUpdateQueryParam } from '../../domain/entities/haa-query-param.entity';
@@ -80,13 +82,19 @@ export default class ExchangeUpdateService extends HaaBaseService<ExchangeUpdate
       const result = await this.executeUpdateExchangeDaoTask(localParams);
       // validate result
 
-      const npaList: NpaExchangeGetEntity[] = await this.executeGetNpaByExchangeDaoTask(localParams);
-      // List<NpaExchange> npaeList =  npaExchangeMapper.getByExchange(exchange);
+      const npaListFromDb: NpaExchangeGetEntity[] = await this.executeGetNpaByExchangeDaoTask(localParams);
 
-      console.log(npaList);
+      if (!exchange.npa || exchange.npa.length === 0) {
+        // updated exchange shouldn't have npa so execute SQL query for deletion
+        return await this.deleteByAbbreviation(localParams, npaListFromDb)
+      } else {
+        const npaListForDeletion: number[] = new Array();
+        // ADD new NPAs
+        await this.addNewNpa(localParams, npaListFromDb, npaListForDeletion);
+        // DELETE missing NPAs from DB that relates to the current exchange.abbreviation
+        await this.deleteMissingNpa(localParams, npaListForDeletion);
+      }
     }
-
-    return { result: "" }
   }
 
   async mapToEntityQueryParams(requestParam: RequestParam): Promise<ExchangeUpdateQueryParam> {
@@ -99,8 +107,60 @@ export default class ExchangeUpdateService extends HaaBaseService<ExchangeUpdate
     return queryParam;
   }
 
+  async addNewNpa(params: any, npaListFromDb: NpaExchangeGetEntity[], npaListForDeletion: number[]) {
+    for await (const npaExchangeFromExchangeEntity of params.npa) {
+      let exists = false;
+      // marking NPA for deletion or creation
+      if (npaListFromDb && npaListFromDb.length > 0) {
+        for await (const npaFromDb of npaListFromDb) {
+          if (npaExchangeFromExchangeEntity.npa === npaFromDb.npa) {
+            exists = true;
+            break;
+          }
+        }
+        // checking if NPA exists in DB
+        const existsInDb = (await this.dao.npaExists({ npa: npaExchangeFromExchangeEntity }, this.conn)) > 0;
+        // creating NPA if it doesn't exist yet
+        if (!exists) {
+          npaListForDeletion.push(npaExchangeFromExchangeEntity.id);
+          if (existsInDb) {
+            const npaExchange = new NpaExchangeAddEntity();
+            npaExchange.id = await this.dao.getNpaExchId();
+            npaExchange.npa = npaExchangeFromExchangeEntity;
+            npaExchange.abbreviation = params.abbreviation;
+            npaExchange.createdUserId = params.createdUserId;
+            npaExchange.lastUpdatedUserId = params.lastUpdatedUserId;
+            // todo create and add item to a new list for the future insert. then execute a multiple sql insert
+            await this.dao.addNpaExchange(npaExchange, this.conn);
+          }
+        }
+      }
+    }
+  }
+
+  async deleteMissingNpa(params: any, npaListForDeletion: number[]) {
+    if (npaListForDeletion) {
+      // todo execute a multiple sql delete
+      for await (const npaExchangeId of npaListForDeletion) {
+        await this.deleteByNpaExchange({ ...params, npaExchangeId });
+      }
+    }
+  }
+
+  async deleteByNpaExchange(params: any) {
+    await this.dao.executeDeletedeleteByNpaExchange(params, this.conn)
+  }
+
+  async deleteByAbbreviation(params: any, npaList: NpaExchangeGetEntity[]) {
+    let result;
+    if (npaList && npaList.length > 0) {
+      result = await this.dao.executeDeleteByAbbreviation(params, this.conn)
+    }
+    return result;
+  }
+
   async executeGetNpaByExchangeDaoTask(params: any) {
-    return await this.dao.executeGetNpaByExchange(params, this.conn)
+    return await this.dao.executeGetNpaByExchange(params)
   }
 
   async executeUpdateExchangeDaoTask(params: any) {
@@ -111,16 +171,6 @@ export default class ExchangeUpdateService extends HaaBaseService<ExchangeUpdate
     return await this.dao.countNpa(params, this.conn);
   }
 
-  // fixme
-  async executeUpdateNpaExchangesDaoTask(params: any) {
-    // params.rowsAffected = 0;
-    // for await (const npaItem of params.npa) {
-    //   const insertResult = await this.dao.addNpaExchange(npaItem, this.conn);
-    //   params.rowsAffected += insertResult?.rowsAffected || 0;
-    // }
-    return params;
-  }
-
   getResponse(params: ExchangeUpdateQueryParam): ResponseDto<HaaBaseDto> {
     let response = new ResponseDto<HaaBaseDto>();
     response.reponseCode(StatusCode.NO_CONTENT);
@@ -128,7 +178,6 @@ export default class ExchangeUpdateService extends HaaBaseService<ExchangeUpdate
   }
   mapQueryParamsToDto(params: any): ResponseDto<ExchangeGetDto> {
     let response = new ResponseDto<ExchangeGetDto>();
-    // params && (response.result = params);
     if (params) {
       response.result = {
         abbreviation: params.abbreviation,
@@ -141,8 +190,6 @@ export default class ExchangeUpdateService extends HaaBaseService<ExchangeUpdate
         sectionNumber: params.sectionNumber
       };
     }
-
-
     return response;
   }
 

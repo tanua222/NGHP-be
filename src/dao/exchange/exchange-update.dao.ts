@@ -18,9 +18,17 @@ export default class ExchangeUpdateDao extends ExchangeAddDao {
     return await this.validateAndExecuteTask('updateExchange', { params }, conn);
   }
 
-  async executeGetNpaByExchange(params: any, conn?: IvsConnection) {
+  async executeGetNpaByExchange(params: any) {
     let result = await this.findByFilters({ params: params, query: 'getNpaByExchange' });
     result = this.mapDbResultToNpaExchangeEntity(result);
     return result;
+  }
+
+  async executeDeleteByAbbreviation(params: any, conn?: IvsConnection) {
+    return await this.validateAndExecuteTask('deleteByAbbreviation', { params }, conn);
+  }
+
+  async executeDeletedeleteByNpaExchange(params: any, conn?: IvsConnection) {
+    return await this.validateAndExecuteTask('deleteByNpaExchange', { params }, conn);
   }
 }

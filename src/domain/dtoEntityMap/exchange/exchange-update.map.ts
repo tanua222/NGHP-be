@@ -4,7 +4,7 @@ import ExchangeUpdateEntity, { NpaExchangeUpdateEntity } from '../../entities/ex
 
 export class ExchangeUpdateMap {
     static dtoToEntityForUpdate(requestParam: RequestParam): ExchangeUpdateEntity[] {
-        const entities:ExchangeUpdateEntity[] = requestParam.inputRequest.map((dto: ExchangeUpdateDto) => {
+        const entities: ExchangeUpdateEntity[] = requestParam.inputRequest.map((dto: ExchangeUpdateDto) => {
             const entity: ExchangeUpdateEntity = new ExchangeUpdateEntity();
             entity.abbreviation = dto.abbreviation.trim();
             entity.fullName = dto.fullName.trim();
@@ -14,13 +14,15 @@ export class ExchangeUpdateMap {
             entity.lastUpdatedUserId = dto.lastUpdatedUserId;
             entity.secondAbbreviation = dto.secondAbbreviation;
             // NpaExchangeUpdateDto[] to NpaExchangeUpdateEntity[]
-            entity.npa = dto.npa.map((npaDto: NpaExchangeUpdateDto) => {
-                const npaEntity: NpaExchangeUpdateEntity = new NpaExchangeUpdateEntity();
-                npaEntity.id = npaDto.id;
-                npaEntity.npa = npaDto.npa;
-    
-                return npaEntity;
-            });
+            if (dto.npa) { 
+                entity.npa = dto.npa.map((npaDto: NpaExchangeUpdateDto) => {
+                    const npaEntity: NpaExchangeUpdateEntity = new NpaExchangeUpdateEntity();
+                    npaEntity.id = npaDto.id;
+                    npaEntity.npa = npaDto.npa;
+
+                    return npaEntity;
+                });
+            }
             return entity;
         })
         return entities;

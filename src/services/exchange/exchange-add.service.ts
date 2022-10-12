@@ -57,7 +57,6 @@ export default class ExchangeAddService extends HaaBaseService<ExchangeAddDao> {
   }
   mapQueryParamsToDto(params: any): ResponseDto<ExchangeGetDto> {
     let response = new ResponseDto<ExchangeGetDto>();
-    // params && (response.result = params);
     if (params) {
       response.result = {
         abbreviation: params.abbreviation,
