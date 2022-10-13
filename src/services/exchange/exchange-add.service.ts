@@ -76,37 +76,30 @@ export default class ExchangeAddService extends HaaBaseService<ExchangeAddDao> {
 
   async validateInput(params: any): Promise<void> {
     const errors: Error[] = [];
-    const npaSet = new Set();
-    const npaList = params.inputRequest?.npa;
-
-    this.validateNpaList(npaList, npaSet, errors);
-
-    params.npaList = Array.from(npaSet).join();
-    const existedNpa = await this.executeCountNpaDaoTask(params);
-
-    if (npaList.length !== existedNpa[0]) {
-      errors.push(errorResponse(ErrorMapping.IVSHAA4404, this.context, { npa: [] }));
-      return ResponseDto.returnValidationErrors(errors);
-    }
+    const npaSet = this.validateNpaList(params.inputRequest?.npa, errors);
+    await this.validateNpaSet(params, npaSet, errors);
   }
 
+  // todo move to base validation service
   async validateNpaSet(params: any, npaSet: any, errors: Error[]) {
     params.npaList = Array.from(npaSet).join();
     let existedNpa = await this.executeCountNpaDaoTask(params);
     existedNpa = existedNpa[0];
 
     if (npaSet.size !== existedNpa) {
-      errors.push(errorResponse(ErrorMapping.IVSHAA4404, this.context, { npa: [] }));
-      return ResponseDto.returnValidationErrors(errors);
+      errors.push(errorResponse(ErrorMapping.IVSHAA4438, this.context, { npa: params.npaList }));
+      ResponseDto.returnValidationErrors(errors);
     }
   }
 
-  validateNpaList(npaList: any, npaSet: any, errors: Error[]): any {
+  // todo move to base validation service
+  validateNpaList(npaList: any, errors: Error[]): any {
     if (!npaList || npaList.length === 0) {
       errors.push(errorResponse(ErrorMapping.IVSHAA4404, this.context, { npa: [] }));
       return ResponseDto.returnValidationErrors(errors);
     }
 
+    const npaSet = new Set();
     for (const item of npaList) {
       const npa = item.npa;
       if (!npa) {
@@ -122,6 +115,7 @@ export default class ExchangeAddService extends HaaBaseService<ExchangeAddDao> {
     if (errors.length > 0) {
       return ResponseDto.returnValidationErrors(errors);
     }
+    return npaSet;
   }
 
   async executeTask(args: any): Promise<ResponseDto<any>> {

@@ -116,4 +116,7 @@ export const ErrorMapping = {
   IVSHAA4437: {
     reason: 'hier.error.user.not.permitted',
   },
+  IVSHAA4438: {
+    reason: 'one.of.npa.not.found.error',
+  },
 };
