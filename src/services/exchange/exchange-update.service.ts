@@ -1,13 +1,13 @@
-import e from 'express';
 import ExchangeUpdateDao from '../../dao/exchange/exchange-update.dao';
 import ExchangeGetDto from '../../domain/dto/exchange/exchange-get.dto';
 import { HaaBaseDto, RequestParam } from '../../domain/dto/haa-common.dto';
-import ResponseDto from '../../domain/dto/response.dto';
+import ResponseDto, { Error } from '../../domain/dto/response.dto';
 import { ExchangeUpdateMap } from '../../domain/dtoEntityMap/exchange/exchange-update.map';
 import { NpaExchangeAddEntity } from '../../domain/entities/exchange/exchange-add.entity';
 import { NpaExchangeGetEntity } from '../../domain/entities/exchange/exchange-get.entity';
 import ExchangeUpdateEntity from '../../domain/entities/exchange/exchange-update.entity';
 import { ExchangeUpdateQueryParam } from '../../domain/entities/haa-query-param.entity';
+import { errorResponse } from '../../error/error-responses';
 import { ErrorMapping } from '../../error/error-responses-mapping';
 import { StatusCode } from '../../utils/constants';
 import Context from '../../utils/context';
@@ -24,30 +24,15 @@ export default class ExchangeUpdateService extends HaaBaseService<ExchangeUpdate
     this.log.debug('ExchangeUpdateService.executeTask connection retrieved: ', this.conn);
     try {
       let params = args.params;
-
-      // fixme
-      // await this.validateInput(params);
+      await this.validateInput(params);
 
       params = await this.mapToEntityQueryParams(params);
-
       this.log.debug(`params`, params);
 
-      let result = await this.executeUpdateExchange(params);
+      await this.executeUpdateExchange(params);
 
-      // if (result) {
-      console.log(result);
-      //   result.expectedRowsAffected = 1;
-      //   this.validateResult(result);
-
-      //   result = await this.executeUpdateNpaExchangesDaoTask(params);
-
-      //   if (result) {
-      //     result.expectedRowsAffected = params?.npa.length || 0;
-      //     this.validateResult(result);
-      //   }
       await this.conn.commit();
       this.log.debug(`data committed`);
-      // }
 
       return this.getResponse(params);
     } catch (error) {
@@ -88,11 +73,10 @@ export default class ExchangeUpdateService extends HaaBaseService<ExchangeUpdate
         // updated exchange shouldn't have npa so execute SQL query for deletion
         return await this.deleteByAbbreviation(localParams, npaListFromDb)
       } else {
-        const npaListForDeletion: number[] = new Array();
         // ADD new NPAs
-        await this.addNewNpa(localParams, npaListFromDb, npaListForDeletion);
+        await this.addNewNpa(localParams, npaListFromDb);
         // DELETE missing NPAs from DB that relates to the current exchange.abbreviation
-        await this.deleteMissingNpa(localParams, npaListForDeletion);
+        await this.deleteMissingNpa(localParams, npaListFromDb);
       }
     }
   }
@@ -107,42 +91,47 @@ export default class ExchangeUpdateService extends HaaBaseService<ExchangeUpdate
     return queryParam;
   }
 
-  async addNewNpa(params: any, npaListFromDb: NpaExchangeGetEntity[], npaListForDeletion: number[]) {
+  async addNewNpa(params: any, npaListFromDb: NpaExchangeGetEntity[]) {
     for await (const npaExchangeFromExchangeEntity of params.npa) {
       let exists = false;
       // marking NPA for deletion or creation
-      if (npaListFromDb && npaListFromDb.length > 0) {
-        for await (const npaFromDb of npaListFromDb) {
+      if (npaListFromDb) {
+        for (const npaFromDb of npaListFromDb) {
           if (npaExchangeFromExchangeEntity.npa === npaFromDb.npa) {
             exists = true;
             break;
           }
         }
-        // checking if NPA exists in DB
-        const existsInDb = (await this.dao.npaExists({ npa: npaExchangeFromExchangeEntity }, this.conn)) > 0;
         // creating NPA if it doesn't exist yet
         if (!exists) {
-          npaListForDeletion.push(npaExchangeFromExchangeEntity.id);
-          if (existsInDb) {
-            const npaExchange = new NpaExchangeAddEntity();
-            npaExchange.id = await this.dao.getNpaExchId();
-            npaExchange.npa = npaExchangeFromExchangeEntity;
-            npaExchange.abbreviation = params.abbreviation;
-            npaExchange.createdUserId = params.createdUserId;
-            npaExchange.lastUpdatedUserId = params.lastUpdatedUserId;
-            // todo create and add item to a new list for the future insert. then execute a multiple sql insert
-            await this.dao.addNpaExchange(npaExchange, this.conn);
-          }
+          const npaExchange = new NpaExchangeAddEntity();
+          npaExchange.id = await this.dao.getNpaExchId();
+          npaExchange.npa = npaExchangeFromExchangeEntity.npa;
+          npaExchange.abbreviation = params.abbreviation;
+          npaExchange.createdUserId = params.createdUserId;
+          npaExchange.lastUpdatedUserId = params.lastUpdatedUserId;
+          // todo create and add item to a new list for the future insert. then execute a multiple sql insert
+          await this.dao.addNpaExchange(npaExchange, this.conn);
         }
       }
     }
   }
 
-  async deleteMissingNpa(params: any, npaListForDeletion: number[]) {
-    if (npaListForDeletion) {
-      // todo execute a multiple sql delete
-      for await (const npaExchangeId of npaListForDeletion) {
-        await this.deleteByNpaExchange({ ...params, npaExchangeId });
+  async deleteMissingNpa(params: any, npaListFromDb: NpaExchangeGetEntity[]) {
+    for await (const npaFromDb of npaListFromDb) {
+      let exists = false;
+      // marking NPA for deletion or creation
+      if (npaListFromDb) {
+        for (const npaExchangeFromExchangeEntity of params.npa) {
+          if (npaExchangeFromExchangeEntity.npa === npaFromDb.npa) {
+            exists = true;
+            break;
+          }
+        }
+        if (!exists) {
+          // todo add to list then execute a multiple sql delete
+          await this.deleteByNpaExchange({ ...params, npaExchangeId: npaFromDb.id });
+        }
       }
     }
   }
@@ -193,47 +182,83 @@ export default class ExchangeUpdateService extends HaaBaseService<ExchangeUpdate
     return response;
   }
 
-  // fixme
   async validateInput(params: any): Promise<void> {
-    // const errors: Error[] = [];
-    // const npa = params.inputRequest?.npa;
+    const errors: Error[] = [];
+    
+    const exchangeList: ExchangeUpdateEntity[] = params.inputRequest;
+    const npaSet = this.validateExchange(exchangeList, errors);
+    
+    await this.validateNpaSet(params, npaSet, errors);
 
-    // if (!npa || npa.length === 0) {
-    //   errors.push(errorResponse(ErrorMapping.IVSHAA4404, this.context, { npa: [] }));
-    //   return ResponseDto.returnValidationErrors(errors);
-    // }
-    // const npaSet = new Set();
-
-    // for (const item of npa) {
-    //   const npa = item.npa;
-    //   if (!npa) {
-    //     errors.push(errorResponse(ErrorMapping.IVSHAA4404, this.context, { item }));
-    //   }
-    //   npaSet.add(item.npa);
-    // }
-
-    // if (npa.length !== npaSet.size) {
-    //   errors.push(errorResponse(ErrorMapping.IVSHAA4420, this.context, { npa, npas: Array.from(npaSet) }));
-    // }
-
-    // if (errors.length > 0) {
-    //   return ResponseDto.returnValidationErrors(errors);
-    // }
-
-    // params.npaList = Array.from(npaSet).join();
-    // const existedNpa = await this.executeCountNpaDaoTask(params);
-
-    // if (npa.length !== existedNpa[0]) {
-    //   errors.push(errorResponse(ErrorMapping.IVSHAA4404, this.context, { npa: [] }));
-    //   return ResponseDto.returnValidationErrors(errors);
-    // }
-  }
-
-  validateResult({ rowsAffected, expectedRowsAffected }: any) {
-    if (rowsAffected < expectedRowsAffected) {
-      throw ResponseDto.internalErrorCode(this.context, ErrorMapping.IVSHAA4417);
+    if (errors.length > 0) {
+      return ResponseDto.returnValidationErrors(errors);
     }
   }
 
+
+  async validateNpaSet(params: any, npaSet: any, errors: Error[]) {
+    params.npaList = Array.from(npaSet).join();
+    let existedNpa = await this.executeCountNpaDaoTask(params);
+    existedNpa = existedNpa[0];
+
+    if (npaSet.size !== existedNpa) {
+      errors.push(errorResponse(ErrorMapping.IVSHAA4438, this.context, { npa: params.npaList }));
+      return ResponseDto.returnValidationErrors(errors);
+    }
+  }
+
+  validateNpaList(npaList: any, errors: Error[]): any {
+    if (!npaList || npaList.length === 0) {
+      errors.push(errorResponse(ErrorMapping.IVSHAA4404, this.context, { npa: [] }));
+      return ResponseDto.returnValidationErrors(errors);
+    }
+
+    const npaSetLocal = new Set();
+
+    for (const item of npaList) {
+      const npa = item.npa;
+      if (!npa) {
+        errors.push(errorResponse(ErrorMapping.IVSHAA4404, this.context, { item }));
+      }
+      npaSetLocal.add(item.npa);
+    }
+
+    if (npaList.length !== npaSetLocal.size) {
+      errors.push(errorResponse(ErrorMapping.IVSHAA4420, this.context, { npa: npaList, npas: Array.from(npaSetLocal) }));
+    }
+
+    if (errors.length > 0) {
+      return ResponseDto.returnValidationErrors(errors);
+    }
+    return npaSetLocal;
+  }
+
+  validateExchange(exchangeList: any, errors: Error[]) {
+    if (!exchangeList || exchangeList.length === 0) {
+      errors.push(errorResponse(ErrorMapping.IVSHAA4404, this.context, { npa: [] }));
+      return ResponseDto.returnValidationErrors(errors);
+    }
+    const abbreviationSet = new Set();
+
+    for (const exchange of exchangeList) {
+      const abbreviation = exchange.abbreviation;
+      if (!abbreviation) {
+        errors.push(errorResponse(ErrorMapping.IVSHAA4404, this.context, { item: exchange }));
+      }
+      abbreviationSet.add(abbreviation);
+    }
+    if (exchangeList.length !== abbreviationSet.size) {
+      errors.push(errorResponse(ErrorMapping.IVSHAA4420, this.context, { npa: exchangeList, npas: Array.from(abbreviationSet) }));
+    }
+
+    let npaSet = new Set();
+    
+    for (const exchange of exchangeList) {
+      const npaList = exchange.npa;
+      const tempSet = this.validateNpaList(npaList, errors);
+      npaSet = new Set([...npaSet, ...tempSet]);
+    }
+    return npaSet;
+  }
 
 }

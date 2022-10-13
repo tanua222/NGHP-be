@@ -29,13 +29,10 @@ updateExchanges(Exchange[]);
      * @param <code>List<Exchange></code>
      * @return <code>true</code> if all the updates were successful. <code>false</code> otherwise
      */
-    public boolean updateExchanges(List<Exchange> exchanges)
-    {
-        try
-        {
+    public boolean updateExchanges(List<Exchange> exchanges) {
+        try {
             LOGGER.debug( "Entering updateExchanges method" );
-            for ( Exchange exchange : exchanges ) //DONE
-            {
+            for ( Exchange exchange : exchanges ) {
                 exchangeMapper.updateExchange( exchange );
                 
                 List<NpaExchange> npaList =  npaExchangeMapper.getByExchange(exchange);
@@ -52,10 +49,8 @@ updateExchanges(Exchange[]);
                 	// ADD new NPAs
                 	for(String npa: npas) {
                 		boolean exists = false;
-                		if (null != npaList && npaList.size() > 0) {
+                		if (null != npaList) {
                     		for (NpaExchange npaExchange : npaList) {
-                                    // you shouldn't update the current NPA because actually nothing changed
-                                    // all three main columns (id, npa, abbrev) are the same
 								if (npa.equalsIgnoreCase(npaExchange.getNpa())) {
 									exists = true;
 									break;
@@ -76,15 +71,14 @@ updateExchanges(Exchange[]);
                     // move to function deteteMissingNpa
                     // add comment for what
                     if (npaList != null) {
-                        for ( NpaExchange npaExchange : npaList ) {
+                        for (NpaExchange npaExchange : npaList) {
                             boolean exists = false;
                             for (String npa : npas){
                                 if (npa.equalsIgnoreCase(npaExchange.getNpa())){
                                     exists = true;
                                 }
                             }
-                            if ( !exists )
-                            {
+                            if ( !exists ) {
                                 npaExchangeMapper.deleteByNpaExchange( npaExchange );
                             }
                         }
