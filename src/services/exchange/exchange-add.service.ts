@@ -76,15 +76,38 @@ export default class ExchangeAddService extends HaaBaseService<ExchangeAddDao> {
 
   async validateInput(params: any): Promise<void> {
     const errors: Error[] = [];
-    const npa = params.inputRequest?.npa;
+    const npaSet = new Set();
+    const npaList = params.inputRequest?.npa;
 
-    if (!npa || npa.length === 0) {
+    this.validateNpaList(npaList, npaSet, errors);
+
+    params.npaList = Array.from(npaSet).join();
+    const existedNpa = await this.executeCountNpaDaoTask(params);
+
+    if (npaList.length !== existedNpa[0]) {
       errors.push(errorResponse(ErrorMapping.IVSHAA4404, this.context, { npa: [] }));
       return ResponseDto.returnValidationErrors(errors);
     }
-    const npaSet = new Set();
+  }
 
-    for (const item of npa) {
+  async validateNpaSet(params: any, npaSet: any, errors: Error[]) {
+    params.npaList = Array.from(npaSet).join();
+    let existedNpa = await this.executeCountNpaDaoTask(params);
+    existedNpa = existedNpa[0];
+
+    if (npaSet.size !== existedNpa) {
+      errors.push(errorResponse(ErrorMapping.IVSHAA4404, this.context, { npa: [] }));
+      return ResponseDto.returnValidationErrors(errors);
+    }
+  }
+
+  validateNpaList(npaList: any, npaSet: any, errors: Error[]): any {
+    if (!npaList || npaList.length === 0) {
+      errors.push(errorResponse(ErrorMapping.IVSHAA4404, this.context, { npa: [] }));
+      return ResponseDto.returnValidationErrors(errors);
+    }
+
+    for (const item of npaList) {
       const npa = item.npa;
       if (!npa) {
         errors.push(errorResponse(ErrorMapping.IVSHAA4404, this.context, { item }));
@@ -92,19 +115,11 @@ export default class ExchangeAddService extends HaaBaseService<ExchangeAddDao> {
       npaSet.add(item.npa);
     }
 
-    if (npa.length !== npaSet.size) {
-      errors.push(errorResponse(ErrorMapping.IVSHAA4420, this.context, { npa, npas: Array.from(npaSet) }));
+    if (npaList.length !== npaSet.size) {
+      errors.push(errorResponse(ErrorMapping.IVSHAA4420, this.context, { npa: npaList, npas: Array.from(npaSet) }));
     }
 
     if (errors.length > 0) {
-      return ResponseDto.returnValidationErrors(errors);
-    }
-
-    params.npaList = Array.from(npaSet).join();
-    const existedNpa = await this.executeCountNpaDaoTask(params);
-
-    if (npa.length !== existedNpa[0]) {
-      errors.push(errorResponse(ErrorMapping.IVSHAA4404, this.context, { npa: [] }));
       return ResponseDto.returnValidationErrors(errors);
     }
   }
