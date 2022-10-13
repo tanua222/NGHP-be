@@ -137,7 +137,7 @@ export default class ExchangeUpdateService extends HaaBaseService<ExchangeUpdate
   }
 
   async deleteByNpaExchange(params: any) {
-    await this.dao.executeDeletedeleteByNpaExchange(params, this.conn)
+    await this.dao.executeDeleteByNpaExchange(params, this.conn)
   }
 
   async deleteByAbbreviation(params: any, npaList: NpaExchangeGetEntity[]) {
@@ -194,7 +194,6 @@ export default class ExchangeUpdateService extends HaaBaseService<ExchangeUpdate
       return ResponseDto.returnValidationErrors(errors);
     }
   }
-
 
   async validateNpaSet(params: any, npaSet: any, errors: Error[]) {
     params.npaList = Array.from(npaSet).join();
