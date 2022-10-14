@@ -17,10 +17,6 @@ export default class ExchangeBaseDao extends HaaBaseDao {
     return ExchangeGetEntity.transform(results);
   }
 
-  // mapDbResultToEntity(results: any): NpaExchangeGetEntity[] {
-  //   return NpaExchangeGetEntity.transform(results);
-  // }
-
   mapEntityParamsToDbColumns(sortParams: SortParam[]): string[] {
     const sortConditions = sortParams
       ?.filter((s1: any) => ExchangeGetEntity.getDbColumnName(s1.fieldName))

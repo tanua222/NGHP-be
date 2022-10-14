@@ -56,11 +56,10 @@
     </select>
 
     <insert id="addExchange">
-            INSERT
-
-            INTO 
-                BLIF_EXCH_MTNC
-                (
+        INSERT
+        INTO 
+            BLIF_EXCH_MTNC
+            (
                     EXCH_ABBREV, 
                     EXCH_FULL_NAME, 
                     EXCH_ABBREV_2,
@@ -70,21 +69,19 @@
                     CREATE_USER_ID,
                     LAST_UPDT_TS,
                     LAST_UPDT_USER_ID
-                )
-
-            VALUES
-
-                (
-                    #{abbreviation},
-                    #{fullName},
-                    #{secondAbbreviation},
-                    #{bookNumber},
-                    #{sectionNumber},
-                    SYSDATE,
-                    #{createdUserId},
-                    SYSDATE,
-                    #{lastUpdatedUserId}
-                )
+            )
+        VALUES
+            (
+                #{abbreviation},
+                #{fullName},
+                #{secondAbbreviation},
+                #{bookNumber},
+                #{sectionNumber},
+                SYSDATE,
+                #{createdUserId},
+                SYSDATE,
+                #{lastUpdatedUserId}
+            )
     </insert>
 
     <update id="updateExchange">
@@ -102,7 +99,13 @@
 			EXCH_ABBREV LIKE #{abbreviation}
 		</where>
 
-	</update>    
+	</update>
+
+    <delete id="deleteMultipleExchangesByAbbreviation">
+		DELETE FROM
+		BLIF_EXCH_MTNC
+		WHERE EXCH_ABBREV IN ('${abbreviations}')
+	</delete>    
 
     <!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
     <!--! NPA Exchange queries section !-->
@@ -112,8 +115,12 @@
 		DELETE FROM BLIF_NPA_EXCH_MTNC
 		WHERE NPA_EXCH_ID = #{npaExchangeId}
 	</delete>
-
     
+    <delete id="deleteMultipleNpaExchangesByAbbreviation">
+		DELETE FROM BLIF_NPA_EXCH_MTNC
+		WHERE EXCH_ABBREV IN ('${abbreviations}')
+	</delete>
+
     <delete id="deleteByAbbreviation">
 		DELETE FROM BLIF_NPA_EXCH_MTNC
 		WHERE EXCH_ABBREV = #{abbreviation}
@@ -121,18 +128,18 @@
 
     <select id="getNpaByExchange">
 		SELECT *
-		  FROM BLIF_NPA_EXCH_MTNC
-		 WHERE EXCH_ABBREV = #{abbreviation}
+		FROM BLIF_NPA_EXCH_MTNC
+		WHERE EXCH_ABBREV = #{abbreviation}
 	</select>
     
     <select id="getNpaExchId">
-          SELECT 
-          BLIF_NPA_EXCH_MTNC_SEQ.nextVal as BNEM_NPA_EXCH_ID
-          from dual
+        SELECT 
+        BLIF_NPA_EXCH_MTNC_SEQ.nextVal as BNEM_NPA_EXCH_ID
+        from dual
     </select>
 
     <insert id="addNpaExchange">
-      INSERT INTO BLIF_NPA_EXCH_MTNC (
+        INSERT INTO BLIF_NPA_EXCH_MTNC (
 				NPA_EXCH_ID, 
 				NPA, 
 				EXCH_ABBREV,
